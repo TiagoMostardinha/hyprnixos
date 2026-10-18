@@ -2,9 +2,9 @@
 
 # oblique-cursor for every consumer, from one fetch:
 # - hyprcursor format (manifest.hl + shapes/) for Hyprland,
-# - XCursor format (cursors/ + index.theme), converted here, for SDDM and
-#   XCursor-only apps.
-# Both live in the same theme folder. Session variables: modules/home/hyprland.nix.
+# - XCursor format (cursors/ + index.theme), converted here, for XCursor-only apps.
+# Both live in the same theme folder. Session variables: modules/home/hyprland.nix
+# (desktop) and modules/nixos/greeter.nix (login screen).
 
 let
   name = "oblique-cursor";
@@ -62,10 +62,4 @@ let
 in
 {
   environment.systemPackages = [ theme ];
-
-  services.displayManager.sddm.settings.Theme = {
-    CursorTheme = name;
-    # Physical px: the greeter is not scaled (the desktop uses 20 logical px).
-    CursorSize = 32;
-  };
 }

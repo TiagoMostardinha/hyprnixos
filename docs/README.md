@@ -12,8 +12,8 @@ Rules for working in this repo: `docs/Context.md`.
 | `modules/nixos/` | shared system config (`default.nix` imports all) |
 | `modules/home/` | shared Home Manager config (`default.nix` imports all) |
 | `dotfiles/hypr/` | Hyprland Lua + hypridle/hyprpaper, symlinked, reload on save |
-| `dotfiles/quickshell/` | Quickshell config, symlinked to `~/.config/quickshell` |
-| `assets/` | wallpaper, lock/login wallpaper, avatar |
+| `dotfiles/quickshell/` | Quickshell config, symlinked to `~/.config/quickshell`; `greeter.qml` is the greetd login screen |
+| `assets/` | desktop wallpaper, avatar (the login/lock wallpaper is in `dotfiles/quickshell/assets/`) |
 | `docs/` | documentation only; not used by any config |
 
 The repo must be cloned to `~/nixos-config` (dotfile links point there).
@@ -25,6 +25,13 @@ nix flake check
 nixos-rebuild build --flake .#latitude-7340
 sudo nixos-rebuild switch --flake .#latitude-7340
 ```
+
+## Login screen problems
+
+The login screen is greetd running a small Hyprland with the Quickshell greeter.
+
+- Its output goes to the journal: `journalctl -b -u greetd` and `journalctl -b -t greeter-hyprland`.
+- If it doesn't appear, press Ctrl+Alt+F2, log in on the console, and run `sudo nixos-rebuild switch --rollback` (or fix the config and switch again).
 
 ## New laptop
 

@@ -14,6 +14,7 @@ in
     "hypr/rules.lua".source = link "rules.lua";
     "hypr/autostart.lua".source = link "autostart.lua";
     "hypr/hyprpaper.conf".source = link "hyprpaper.conf";
+    "hypr/hyprtoolkit.conf".source = link "hyprtoolkit.conf";
 
     # UWSM loads these into every session (instead of hl.env in hyprland.lua).
     "uwsm/env".text = ''

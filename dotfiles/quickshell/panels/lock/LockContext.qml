@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pam
+import "../../theme"
 
 // Lock state shared by the surfaces on every screen.
 Scope {
@@ -9,18 +10,18 @@ Scope {
     signal unlocked
 
     property string password: ""
-    property string error: ""
-    readonly property bool authenticating: pam.active
+    property bool failed: false
+    readonly property bool busy: pam.active
 
     function reset(): void {
         password = "";
-        error = "";
+        failed = false;
     }
 
     function submit(): void {
         if (pam.active || password === "")
             return;
-        error = "";
+        failed = false;
         pam.start();
     }
 
@@ -41,8 +42,16 @@ Scope {
                 root.unlocked();
             } else {
                 root.password = "";
-                root.error = result === PamResult.Failed ? "Wrong password" : "Authentication error";
+                root.failed = true;
+                failTimer.restart();
             }
         }
+    }
+
+    Timer {
+        id: failTimer
+
+        interval: Theme.login.failDuration
+        onTriggered: root.failed = false
     }
 }

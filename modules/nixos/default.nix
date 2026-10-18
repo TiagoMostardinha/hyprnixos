@@ -5,8 +5,9 @@
     ./cursor.nix
     ./desktop.nix
     ./fonts.nix
+    ./greeter.nix
+    ./icons.nix
     ./power.nix
-    ./sddm
     ./thunar.nix
     ./users.nix
   ];
