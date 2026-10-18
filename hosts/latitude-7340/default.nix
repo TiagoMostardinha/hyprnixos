@@ -37,10 +37,6 @@
     }
   ];
 
-  # Early KMS: load the GPU driver in the initrd so the display is ready before
-  # greetd starts the login screen (otherwise Hyprland can race i915 and abort).
-  boot.initrd.kernelModules = [ "i915" ];
-
   # Hardware video acceleration for the Intel Iris Xe GPU.
   hardware.graphics.extraPackages = with pkgs; [
     intel-media-driver

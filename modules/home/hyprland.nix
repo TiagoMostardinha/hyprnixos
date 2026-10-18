@@ -19,6 +19,8 @@ in
     "uwsm/env".text = ''
       export HYPRCURSOR_THEME=oblique-cursor
       export HYPRCURSOR_SIZE=20
+      export XCURSOR_THEME=oblique-cursor
+      export XCURSOR_SIZE=20
     '';
 
     "swappy/config".text = ''

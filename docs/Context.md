@@ -26,7 +26,7 @@ nixos-config/
 ├── docs/                        # documentation only; nothing in the config imports it
 │   ├── Context.md               # this file
 │   └── README.md                # layout map + "new laptop" checklist
-├── assets/                      # wallpaper.jpg (hyprpaper), avatar.jpg (greeter + lock, via AccountsService)
+├── assets/                      # wallpaper.jpg (hyprpaper), avatar.jpg (SDDM + lock, via AccountsService)
 │
 ├── hosts/                       # ONLY hardware-tied config
 │   └── <laptop-name>/
@@ -38,7 +38,7 @@ nixos-config/
 │   ├── nixos/                   # shared system config; default.nix imports all
 │   │   ├── core.nix             # nix.settings, gc, nix-ld, locale, time, networking, recovery tools
 │   │   ├── desktop.nix          # programs.hyprland (+UWSM), portals, pipewire, keyring, lock PAM service
-│   │   ├── greeter.nix          # greetd → minimal Hyprland → Quickshell greeter (dotfiles/quickshell/greeter.qml)
+│   │   ├── sddm/                # login manager + custom Qt6 theme (theme/), Colloid status icons
 │   │   ├── icons.nix            # Colloid icon theme, system-wide
 │   │   ├── cursor.nix           # oblique-cursor (hyprcursor + XCursor), one fetch
 │   │   ├── bluetooth.nix, power.nix, thunar.nix, fonts.nix
@@ -63,12 +63,11 @@ nixos-config/
     │   └── hyprtoolkit.conf     # hyprtoolkit apps (hyprlauncher, polkit agent): icon theme
     └── quickshell/
         ├── shell.qml            # entry point: desktop shell (live, hot reload)
-        ├── greeter.qml          # entry point: login greeter (store copy, rebuild to apply)
         ├── theme/Theme.qml      # theme tokens (pragma Singleton)
         ├── services/            # singletons wrapping system data (Time, Battery, Network, CapsLock, User)
         ├── components/          # reusable widgets (LoginScreen, Avatar, DateClock, StatusIcons)
         ├── assets/              # wallpaper.jpg of the login/lock screen
-        └── panels/              # lock/, greeter/ (done); bar/, launcher/, notifications/, control-center/ later
+        └── panels/              # lock/ (done); bar/, launcher/, notifications/, control-center/ later
 ```
 
 The host's `home.nix` generates `~/.config/hypr/host.lua`; the shared `hyprland.lua` loads it with `dofile`, last, so it overrides the fallback monitor. That is why `dotfiles/hypr/` is linked file by file, not as one folder.
@@ -197,14 +196,16 @@ The desktop UI is one Quickshell config at `dotfiles/quickshell/`, linked to `~/
 - Icons: every icon in the project comes from the **Colloid** icon theme (variant `Colloid-Dark`, `pkgs.colloid-icon-theme`, installed in `modules/nixos/icons.nix`).
   - In QML, use `Quickshell.iconPath("<freedesktop-name>")` (the `//@ pragma IconTheme Colloid-Dark` line at the top of both entry files selects the theme). Don't ship icon files.
   - GTK apps get the theme from `modules/home/gtk.nix`, and hyprtoolkit apps from `dotfiles/hypr/hyprtoolkit.conf`.
+  - The SDDM theme gets Colloid's `status/symbolic` folder linked in as `assets/icons` by `modules/nixos/sddm/default.nix`.
   - Before using a name, check that it exists under `/run/current-system/sw/share/icons/Colloid-Dark/`.
 - Add optional Qt modules only when used: `qtsvg` (SVG icons; already part of the nixpkgs Quickshell package), `qtimageformats` (WEBP), `qtmultimedia` (audio/video), `qt5compat` (avoid; prefer `MultiEffect` for blur).
 - Run Quickshell as a user systemd service (Home Manager) bound to the graphical session, not as `exec-once`.
 
 **Structure and QML conventions**
 
-- `shell.qml` and `greeter.qml` (root `ShellRoot`) only wire panels together; no UI logic lives there. Both entry files sit at the config root because Quickshell only resolves imports inside the entry file's folder. Don't create named sub-configs or entry files in subfolders.
-- The login greeter and the lock screen share one look: `components/LoginScreen.qml`, which reproduces the old SDDM theme. Change it there and both follow. The greeter runs as the `greeter` user from a store copy of `dotfiles/quickshell`, so it can't read `~` and greeter changes need a rebuild. Its inputs come from environment variables (`QS_LOGIN_USER`, `QS_LOGIN_SESSION`) set in `modules/nixos/greeter.nix`.
+- `shell.qml` (root `ShellRoot`) only wires panels together; no UI logic lives there. Since `~/.config/quickshell/shell.qml` exists, do not create named sub-configs. Quickshell only resolves imports inside the entry file's folder.
+- The lock screen (`components/LoginScreen.qml`) copies the look of the SDDM login theme (`modules/nixos/sddm/theme`). SDDM can't run Quickshell, so the two are separate code: when the look changes, change both.
+- The login manager is SDDM, launching the `hyprland-uwsm` session. Don't replace it with greetd: a greetd + Hyprland + Quickshell greeter was tried and broke login.
 - One component per file, `PascalCase.qml`, so it is usable as a type by name. Lowercase folder names. Import folders with relative `import "../components"`. Do not use `root:/` imports (they break the LSP and singletons).
 - Shared state and system data live in singletons (`pragma Singleton` + `Singleton` root) under `services/` (e.g. `Audio`, `Battery`, `Network`, `Notifs`). Panels read from services; they never spawn their own processes.
 - Multi-monitor: wrap per-screen windows in `Variants { model: Quickshell.screens }` and take the screen from `modelData`. Keep `Process`, `Timer` and other shared objects outside the delegate so they aren't duplicated per screen.

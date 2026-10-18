@@ -2,10 +2,10 @@ import QtQuick
 import "../theme"
 import "../services"
 
-// The login look, shared by the greeter and the lock screen: wallpaper,
-// date + clock on top, avatar + name + password prompt + status at the bottom.
-// The owner keeps the state so several screens can share it; this item shows
-// it and reports input.
+// The lock screen, with the same look as the SDDM login (modules/nixos/sddm):
+// wallpaper, date + clock on top, avatar + name + password prompt + status at
+// the bottom. The owner keeps the state so several screens can share it; this
+// item shows it and reports input.
 Item {
     id: root
 
