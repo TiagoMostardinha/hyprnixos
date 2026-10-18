@@ -15,10 +15,8 @@
     options = "--delete-older-than 14d";
   };
 
-  # Obsidian is unfree.
   nixpkgs.config.allowUnfree = true;
 
-  # Run unpatched binaries (language servers, downloaded tools).
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
@@ -46,7 +44,6 @@
 
   services.fwupd.enable = true;
 
-  # Small machine-wide recovery toolset.
   environment.systemPackages = with pkgs; [
     btop
     curl

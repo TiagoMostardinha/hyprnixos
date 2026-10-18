@@ -2,10 +2,6 @@ import QtQuick
 import "../theme"
 import "../services"
 
-// The lock screen, with the same look as the SDDM login (modules/nixos/sddm):
-// wallpaper, date + clock on top, avatar + name + password prompt + status at
-// the bottom. The owner keeps the state so several screens can share it; this
-// item shows it and reports input.
 Item {
     id: root
 
@@ -19,7 +15,7 @@ Item {
     Image {
         anchors.fill: parent
         source: Theme.wallpaper
-        sourceSize.width: width // decode at screen size, not full resolution
+        sourceSize.width: width
         fillMode: Image.PreserveAspectCrop
     }
 
@@ -27,11 +23,11 @@ Item {
         anchors.fill: parent
     }
 
-    // Invisible input that owns the keyboard; the dots are drawn below.
     TextInput {
         opacity: 0
         focus: true
         echoMode: TextInput.Password
+        readOnly: root.busy
         text: root.password
         onTextEdited: root.edited(text)
         onAccepted: root.submitted()
@@ -55,7 +51,6 @@ Item {
         font.pixelSize: root.height * Theme.nameSize
     }
 
-    // One prompt line that turns into dots while typing.
     Text {
         anchors.horizontalCenter: parent.horizontalCenter
         y: root.height * Theme.promptY - height / 2

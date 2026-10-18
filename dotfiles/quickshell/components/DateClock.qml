@@ -2,7 +2,6 @@ import QtQuick
 import "../theme"
 import "../services"
 
-// Date above a large 24h clock. Fills the screen; positions are fractions of its height.
 Item {
     id: root
 

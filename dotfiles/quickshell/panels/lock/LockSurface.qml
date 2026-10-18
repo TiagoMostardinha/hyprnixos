@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell.Wayland
 import "../../components"
 
-// Lock screen for one monitor: the same look as the SDDM login.
 WlSessionLockSurface {
     id: root
 

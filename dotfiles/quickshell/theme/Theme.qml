@@ -3,21 +3,16 @@ pragma Singleton
 import QtQuick
 import Quickshell
 
-// Single source of truth for colors, fonts, sizes and timings.
-// Hyprland's colors live in dotfiles/hypr/colors.lua: keep shared colors in sync.
 Singleton {
-    // Login and lock screen: white text straight on the wallpaper.
     readonly property url wallpaper: Qt.resolvedUrl("../assets/wallpaper.jpg")
     readonly property string fontFamily: "Inter"
     readonly property color text: "#ffffff"
-    readonly property color textClock: "#e6ffffff"  // 90 %
-    readonly property color textMuted: "#99ffffff"  // 60 %
-    readonly property color outline: "#33ffffff"    // 20 %
+    readonly property color textClock: "#e6ffffff"
+    readonly property color textMuted: "#99ffffff"
+    readonly property color outline: "#33ffffff"
     readonly property color error: "#ff8a8a"
-    readonly property int failDuration: 2000        // ms "Wrong password" stays
+    readonly property int failDuration: 2000
 
-    // Layout as fractions of the screen height, so it looks the same on any
-    // resolution. "Y" is the vertical center of the item.
     readonly property real dateY: 0.107
     readonly property real dateSize: 0.0254
     readonly property real clockY: 0.185

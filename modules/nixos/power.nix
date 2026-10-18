@@ -13,7 +13,6 @@
     };
   };
 
-  # Suspend only.
   systemd.sleep.settings.Sleep = {
     AllowHibernation = false;
     AllowHybridSleep = false;

@@ -3,7 +3,6 @@ import Quickshell
 import Quickshell.Services.Pam
 import "../../theme"
 
-// Lock state shared by the surfaces on every screen.
 Scope {
     id: root
 
@@ -11,26 +10,31 @@ Scope {
 
     property string password: ""
     property bool failed: false
+    property string submitted: ""
     readonly property bool busy: pam.active
 
     function submit(): void {
-        if (!pam.active)
-            pam.start();
+        if (pam.active || password === "")
+            return;
+        submitted = password;
+        password = "";
+        pam.start();
     }
 
     PamContext {
         id: pam
 
-        // /etc/pam.d/quickshell (modules/nixos/desktop.nix)
         config: "quickshell"
 
         onPamMessage: {
-            if (responseRequired)
-                respond(root.password);
+            if (responseRequired) {
+                respond(root.submitted);
+                root.submitted = "";
+            }
         }
 
         onCompleted: result => {
-            root.password = "";
+            root.submitted = "";
             if (result === PamResult.Success) {
                 root.unlocked();
             } else {

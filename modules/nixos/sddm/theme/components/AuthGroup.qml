@@ -1,7 +1,5 @@
 import QtQuick
 
-// Middle/lower group: avatar, name and one prompt line that turns into dots while typing.
-// Battery / network status sits below the prompt.
 Item {
     id: root
 
@@ -15,13 +13,11 @@ Item {
 
     signal submit(string password)
 
-    // Called by Main after a wrong password.
     function clear() {
         pw.text = ""
         pw.forceActiveFocus()
     }
 
-    // Invisible input that owns the keyboard; the dots are drawn by hand.
     TextInput {
         id: pw
         opacity: 0

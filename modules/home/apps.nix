@@ -4,7 +4,6 @@
   home.packages = [
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.imv
-    # Zed and its Nix language servers.
     pkgs.zed-editor
     pkgs.nil
     pkgs.nixd

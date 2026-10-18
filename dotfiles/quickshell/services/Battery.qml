@@ -4,7 +4,6 @@ import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
 
-// Laptop battery (UPower's display device: ignores peripherals like the stylus).
 Singleton {
     readonly property UPowerDevice device: UPower.displayDevice
 

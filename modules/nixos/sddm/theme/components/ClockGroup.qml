@@ -1,6 +1,5 @@
 import QtQuick
 
-// Top group: date above a large 24h clock. Sizes are fractions of the screen height.
 Item {
     property real sh
     property string fontFamily

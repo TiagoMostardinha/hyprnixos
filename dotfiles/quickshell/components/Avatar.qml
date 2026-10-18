@@ -2,7 +2,6 @@ import QtQuick
 import Quickshell.Widgets
 import "../theme"
 
-// Round avatar with a thin light outline, cropped to fill.
 ClippingRectangle {
     id: root
 

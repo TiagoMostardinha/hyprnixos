@@ -33,12 +33,9 @@
   security.rtkit.enable = true;
 
   services.gnome.gnome-keyring.enable = true;
-  # programs.ssh.startAgent (core.nix) provides the SSH agent.
   services.gnome.gcr-ssh-agent.enable = false;
 
-  # PAM service for the Quickshell lock screen (dotfiles/quickshell/panels/lock).
   security.pam.services.quickshell = { };
 
-  # Tray applet until Quickshell has a network panel.
   programs.nm-applet.enable = true;
 }

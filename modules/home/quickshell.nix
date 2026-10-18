@@ -11,7 +11,6 @@ in
 {
   home.packages = [ pkgs.quickshell ];
 
-  # Live-editable: Quickshell reloads on save.
   xdg.configFile."quickshell".source =
     config.lib.file.mkOutOfStoreSymlink "${repo}/dotfiles/quickshell";
 

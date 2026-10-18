@@ -13,6 +13,7 @@ This is the context file for Claude Code in my `nixos-config` repo: one flake th
 5. **Live-editable UI.** Hyprland and Quickshell config are real files in `dotfiles/`, symlinked out of the Nix store so they reload on save without a rebuild.
 6. **Match the existing structure.** Before adding a file, check if an existing module is the right home. Ask before creating a new top-level folder.
 7. **Verify before claiming done.** Run `nix flake check` and `nixos-rebuild build --flake .#<host>` (or `dry-build`) after Nix changes, and `hyprctl configerrors` after Hyprland changes.
+8. **No comments.** Don't write comments in any config file (`.nix`, `.lua`, `.qml`, `.conf`, scripts). Names and structure must speak for themselves. Explanations go in chat or in `docs/`, never in the code.
 
 ## Repository file tree
 

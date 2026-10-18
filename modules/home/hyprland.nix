@@ -5,8 +5,6 @@ let
   link = file: config.lib.file.mkOutOfStoreSymlink "${repo}/dotfiles/hypr/${file}";
 in
 {
-  # Linked file by file: hosts/<name>/home.nix generates hypr/host.lua next to them.
-  # Hyprland resolves these symlinks, so require() looks in dotfiles/hypr/.
   xdg.configFile = {
     "hypr/hyprland.lua".source = link "hyprland.lua";
     "hypr/colors.lua".source = link "colors.lua";
@@ -15,7 +13,6 @@ in
     "hypr/hyprpaper.conf".source = link "hyprpaper.conf";
     "hypr/hyprtoolkit.conf".source = link "hyprtoolkit.conf";
 
-    # UWSM loads these into every session (instead of hl.env in hyprland.lua).
     "uwsm/env".text = ''
       export HYPRCURSOR_THEME=oblique-cursor
       export HYPRCURSOR_SIZE=20
@@ -34,7 +31,7 @@ in
   home.packages = with pkgs; [
     brightnessctl
     grim
-    hyprlauncher # app launcher until Quickshell has one
+    hyprlauncher
     playerctl
     slurp
     swappy
@@ -42,7 +39,6 @@ in
     wl-clipboard
   ];
 
-  # Wallpaper: config is dotfiles/hypr/hyprpaper.conf (settings = { } writes none).
   services.hyprpaper = {
     enable = true;
     settings = { };

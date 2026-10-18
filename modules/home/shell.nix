@@ -4,7 +4,6 @@
   programs.kitty = {
     enable = true;
 
-    # Package: modules/nixos/fonts.nix.
     font = {
       name = "JetBrainsMono Nerd Font";
       size = 12;

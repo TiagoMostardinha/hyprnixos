@@ -1,11 +1,5 @@
 { pkgs, ... }:
 
-# oblique-cursor for every consumer, from one fetch:
-# - hyprcursor format (manifest.hl + shapes/) for Hyprland,
-# - XCursor format (cursors/ + index.theme), converted here, for SDDM and
-#   XCursor-only apps.
-# Both live in the same theme folder. Session variables: modules/home/hyprland.nix.
-
 let
   name = "oblique-cursor";
 
@@ -14,9 +8,6 @@ let
     hash = "sha256-pROJC0G2MTs5ktfMjISFrK9ZzZWE9upFuUzZLk/mdDo=";
   };
 
-  # hyprcursor shapes (*.hlc) are zip files holding an SVG plus meta.hl with the
-  # hotspot (as a fraction of the image) and the XCursor names the shape stands
-  # for. Rasterize each SVG at a few sizes and pack them with xcursorgen.
   theme =
     pkgs.runCommand "${name}-theme"
       {
@@ -51,7 +42,6 @@ let
           done
           xcursorgen "$dir/cfg" "$theme/cursors/$shape"
 
-          # Other names for the same shape (left_ptr, hand, xterm, ...).
           for alias in $(sed -n 's/^define_override *= *//p' "$dir/meta.hl" | tr ';' ' '); do
             [ "$alias" = "$shape" ] || ln -sf "$shape" "$theme/cursors/$alias"
           done
@@ -65,7 +55,6 @@ in
 
   services.displayManager.sddm.settings.Theme = {
     CursorTheme = name;
-    # Physical px: the greeter is not scaled (the desktop uses 20 logical px).
     CursorSize = 32;
   };
 }

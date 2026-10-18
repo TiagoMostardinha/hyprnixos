@@ -1,26 +1,19 @@
 import QtQuick
 
-// Battery (left) and network (right), icons only.
-//
-// The greeter has no system APIs, so the data is read from the kernel with
-// XMLHttpRequest on file:// URLs. Qt only allows that when QML_XHR_ALLOW_FILE_READ=1
-// is set in the greeter's environment (see modules/nixos/sddm/default.nix). Without it every read
-// fails and this item hides itself, so the login screen is never affected.
 Item {
     id: root
 
-    property real unit: 20            // base size in px; icons are 1.5x
+    property real unit: 20
 
-    property int batteryPercent: -1   // -1: no battery or unreadable
+    property int batteryPercent: -1
     property bool charging: false
-    property string netType: ""       // "wifi" | "ethernet" | "none" ("" = unreadable)
-    property int wifiLevel: 4         // 1..4 bars, only used when netType is "wifi"
+    property string netType: ""
+    property int wifiLevel: 4
 
     visible: batteryPercent >= 0 || netType !== ""
     implicitWidth: row.width
     implicitHeight: unit * 1.5
 
-    // Reads a small text file; calls done(text), or done(null) on failure.
     function readFile(path, done) {
         var xhr = new XMLHttpRequest()
         xhr.onreadystatechange = function () {
@@ -45,9 +38,6 @@ Item {
         })
     }
 
-    // Connection = the interface holding the default route (/proc/net/route). If it is
-    // listed in /proc/net/wireless (column 3: link quality 0..70) it is wifi, otherwise
-    // ethernet. No default route means no connection.
     function refreshNetwork() {
         readFile("/proc/net/route", function (route) {
             if (route === null) { root.netType = ""; return }
@@ -78,13 +68,11 @@ Item {
         onTriggered: { root.refreshBattery(); root.refreshNetwork() }
     }
 
-    // Colloid-Dark symbolic status icons, linked into assets/icons by modules/nixos/sddm.
     function icon(name) {
         return Qt.resolvedUrl("../assets/icons/" + name + "-symbolic.svg")
     }
 
-    // Rounded down: Colloid has no battery-level-100-charging icon.
-    readonly property int batteryLevel: Math.floor(batteryPercent / 10) * 10
+    readonly property int batteryLevel: Math.max(0, Math.floor(batteryPercent / 10) * 10)
     readonly property string networkIcon: netType === "wifi"
         ? "network-wireless-signal-" + ["weak", "ok", "good", "excellent"][wifiLevel - 1]
         : netType === "ethernet" ? "network-wired" : "network-offline"
