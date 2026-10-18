@@ -13,16 +13,9 @@ Scope {
     property bool failed: false
     readonly property bool busy: pam.active
 
-    function reset(): void {
-        password = "";
-        failed = false;
-    }
-
     function submit(): void {
-        if (pam.active || password === "")
-            return;
-        failed = false;
-        pam.start();
+        if (!pam.active)
+            pam.start();
     }
 
     PamContext {
@@ -37,11 +30,10 @@ Scope {
         }
 
         onCompleted: result => {
+            root.password = "";
             if (result === PamResult.Success) {
-                root.reset();
                 root.unlocked();
             } else {
-                root.password = "";
                 root.failed = true;
                 failTimer.restart();
             }
@@ -51,7 +43,7 @@ Scope {
     Timer {
         id: failTimer
 
-        interval: Theme.login.failDuration
+        interval: Theme.failDuration
         onTriggered: root.failed = false
     }
 }

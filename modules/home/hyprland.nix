@@ -12,7 +12,6 @@ in
     "hypr/colors.lua".source = link "colors.lua";
     "hypr/binds.lua".source = link "binds.lua";
     "hypr/rules.lua".source = link "rules.lua";
-    "hypr/autostart.lua".source = link "autostart.lua";
     "hypr/hyprpaper.conf".source = link "hyprpaper.conf";
     "hypr/hyprtoolkit.conf".source = link "hyprtoolkit.conf";
 
@@ -20,8 +19,6 @@ in
     "uwsm/env".text = ''
       export HYPRCURSOR_THEME=oblique-cursor
       export HYPRCURSOR_SIZE=20
-      export XCURSOR_THEME=oblique-cursor
-      export XCURSOR_SIZE=20
     '';
 
     "swappy/config".text = ''

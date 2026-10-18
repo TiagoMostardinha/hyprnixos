@@ -21,13 +21,6 @@ hl.window_rule({
     no_focus = true,
 })
 
-hl.window_rule({
-    name  = "move-hyprland-run",
-    match = { class = "hyprland-run" },
-    move  = "20 monitor_h-120",
-    float = true,
-})
-
 -- Fullscreen windows (video, games) keep the screen awake; hypridle honours this.
 hl.window_rule({
     name  = "idle-inhibit-fullscreen",

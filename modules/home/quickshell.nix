@@ -20,12 +20,10 @@ in
       Description = "Quickshell desktop shell";
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
-      ConditionEnvironment = "WAYLAND_DISPLAY";
     };
     Service = {
       ExecStart = lib.getExe pkgs.quickshell;
       Restart = "on-failure";
-      RestartSec = 1;
     };
     Install.WantedBy = [ "graphical-session.target" ];
   };

@@ -5,13 +5,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
-import "../../services"
 
-// Session lock. Triggered by `loginctl lock-session` -> hypridle lock_cmd ->
-//   qs ipc call lock lock
+// Session lock. `loginctl lock-session` -> hypridle lock_cmd -> qs ipc call lock lock
 Scope {
-    id: root
-
     LockContext {
         id: lockContext
 
@@ -31,10 +27,6 @@ Scope {
         target: "lock"
 
         function lock(): void {
-            if (sessionLock.locked)
-                return;
-            lockContext.reset();
-            CapsLock.refresh();
             sessionLock.locked = true;
         }
     }

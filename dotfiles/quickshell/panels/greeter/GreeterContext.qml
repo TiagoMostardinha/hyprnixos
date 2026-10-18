@@ -5,7 +5,7 @@ import "../../theme"
 import "../../services"
 
 // Login state shared by the greeter windows on every screen, driving greetd:
-// createSession -> authMessage (respond with the password) -> readyToLaunch -> launch.
+// createSession -> authMessage (answer with the password) -> readyToLaunch -> launch.
 Scope {
     id: root
 
@@ -13,16 +13,12 @@ Scope {
     property bool busy: false
     property bool failed: false
 
-    // Session to start, from QS_LOGIN_SESSION (modules/nixos/greeter.nix).
-    readonly property string session: Quickshell.env("QS_LOGIN_SESSION") || ""
-
     function submit(): void {
-        if (busy || password === "")
+        if (busy)
             return;
         busy = true;
         failed = false;
-        if (Greetd.state === GreetdState.Inactive)
-            Greetd.createSession(User.name);
+        Greetd.createSession(User.name);
     }
 
     function fail(): void {
@@ -40,8 +36,9 @@ Scope {
                 Greetd.respond(root.password);
         }
 
+        // QS_LOGIN_SESSION: the session command, set in modules/nixos/greeter.nix.
         function onReadyToLaunch(): void {
-            Greetd.launch([root.session]);
+            Greetd.launch([Quickshell.env("QS_LOGIN_SESSION")]);
         }
 
         function onAuthFailure(message: string): void {
@@ -49,7 +46,6 @@ Scope {
         }
 
         function onError(error: string): void {
-            console.warn("greetd:", error);
             Greetd.cancelSession();
             root.fail();
         }
@@ -58,7 +54,7 @@ Scope {
     Timer {
         id: failTimer
 
-        interval: Theme.login.failDuration
+        interval: Theme.failDuration
         onTriggered: root.failed = false
     }
 }

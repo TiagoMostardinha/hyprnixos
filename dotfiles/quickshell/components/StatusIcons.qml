@@ -1,45 +1,35 @@
 import QtQuick
 import Quickshell
-import "../theme"
 import "../services"
 
-// Battery (left) and network (right), icons only, from the icon theme
-// (Colloid, set by the IconTheme pragma in shell.qml / greeter.qml).
+// Battery and network icons from the icon theme (Colloid, see the IconTheme pragma).
 Row {
     id: root
 
-    // Base size in px: icons are 1.5 units, the gap 0.9.
-    required property real unit
+    required property real size
 
-    readonly property real iconSize: unit * 1.5
-
-    readonly property string batteryIcon: {
-        const level = Math.round(Battery.percent / 10) * 10;
-        if (Battery.charging)
-            return level === 100 ? "battery-level-100-charged-symbolic" : `battery-level-${level}-charging-symbolic`;
-        return `battery-level-${level}-symbolic`;
-    }
+    // Rounded down: Colloid has no battery-level-100-charging icon.
+    readonly property int batteryLevel: Math.floor(Battery.percent / 10) * 10
+    readonly property string batteryIcon: Battery.charging ? `battery-level-${batteryLevel}-charging-symbolic` : `battery-level-${batteryLevel}-symbolic`
 
     readonly property string networkIcon: {
-        if (Network.type === "ethernet")
+        if (Network.wired)
             return "network-wired-symbolic";
-        if (Network.type === "wifi")
-            return `network-wireless-signal-${["weak", "ok", "good", "excellent"][Network.wifiLevel - 1]}-symbolic`;
+        if (Network.wifi)
+            return `network-wireless-signal-${["weak", "ok", "good", "excellent"][Math.max(0, Math.ceil(Network.wifi.signalStrength * 4) - 1)]}-symbolic`;
         return "network-offline-symbolic";
     }
 
-    spacing: unit * 0.9
-
     Image {
         visible: Battery.available
-        width: root.iconSize
+        width: root.size
         height: width
         sourceSize: Qt.size(width, height)
         source: Quickshell.iconPath(root.batteryIcon)
     }
 
     Image {
-        width: root.iconSize
+        width: root.size
         height: width
         sourceSize: Qt.size(width, height)
         source: Quickshell.iconPath(root.networkIcon)
