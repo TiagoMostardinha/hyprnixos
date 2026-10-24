@@ -1,6 +1,7 @@
 import QtQuick
 
 Rectangle {
+    readonly property string side: "center"
     readonly property int drop: 0
     readonly property int gap: 12
 

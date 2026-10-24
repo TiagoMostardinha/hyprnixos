@@ -3,6 +3,7 @@ import QtQuick
 Rectangle {
     id: card
 
+    readonly property string side: "center"
     readonly property int drop: 6
     readonly property int gap: 20
 

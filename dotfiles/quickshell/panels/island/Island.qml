@@ -8,12 +8,18 @@ import Quickshell.Widgets
 PanelWindow {
     id: root
 
-    readonly property string card: "Calendar"
+    readonly property string card: "Media"
 
     readonly property int orbSize: 32
     readonly property real battery: 1.0
 
-    readonly property Item current: loader.item
+    readonly property Item shown: cardLoader.item
+    readonly property bool leftCard: shown?.side === "left"
+    readonly property Item center: leftCard ? idleLoader.item : shown
+    readonly property Item left: leftCard ? shown : leftOrb
+
+    readonly property real leftExtent: center ? center.width / 2 + (leftCard ? shown.gap : center.gap) + left.width : 0
+    readonly property real rightExtent: center ? center.width / 2 + center.gap + orbSize : 0
 
     screen: Quickshell.screens.find(s => s.name === "eDP-1") ?? null
     anchors.top: true
@@ -22,11 +28,37 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
 
-    implicitWidth: current ? current.width + 2 * (current.gap + orbSize) : 1
-    implicitHeight: current ? Math.max(orbSize, current.drop + current.height) : 1
+    implicitWidth: Math.max(1, 2 * Math.max(leftExtent, rightExtent))
+    implicitHeight: Math.max(orbSize, center ? center.drop + center.height : 0, leftCard ? shown.drop + shown.height : 0)
     color: "transparent"
 
+    mask: Region {
+        Region { item: root.left }
+        Region { item: root.center }
+        Region { item: rightOrb }
+    }
+
+    Loader {
+        id: cardLoader
+
+        x: root.leftCard ? root.width / 2 - root.leftExtent : root.width / 2 - width / 2
+        y: item ? item.drop : 0
+        source: root.card + "Card.qml"
+    }
+
+    Loader {
+        id: idleLoader
+
+        active: root.leftCard
+        x: root.width / 2 - width / 2
+        source: "IdleCard.qml"
+    }
+
     Rectangle {
+        id: leftOrb
+
+        visible: !root.leftCard
+        x: root.width / 2 - root.leftExtent
         width: root.orbSize
         height: width
         radius: width / 2
@@ -41,16 +73,10 @@ PanelWindow {
         }
     }
 
-    Loader {
-        id: loader
-
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: item ? item.drop : 0
-        source: root.card + "Card.qml"
-    }
-
     Rectangle {
-        anchors.right: parent.right
+        id: rightOrb
+
+        x: root.width / 2 + root.rightExtent - width
         width: root.orbSize
         height: width
         radius: width / 2
