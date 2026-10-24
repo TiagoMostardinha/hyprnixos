@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
 
@@ -9,6 +10,8 @@ PanelWindow {
 
     readonly property int orbSize: 28
     readonly property real battery: 0.75
+    readonly property int top: 8
+    readonly property int shadowRoom: 16
 
     readonly property Item shown: cardLoader.item
     readonly property bool leftCard: shown?.side === "left"
@@ -21,13 +24,12 @@ PanelWindow {
 
     screen: Quickshell.screens.find(s => s.name === "eDP-1") ?? null
     anchors.top: true
-    margins.top: 8
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
 
-    implicitWidth: Math.max(1, 2 * Math.max(leftExtent, rightExtent))
-    implicitHeight: Math.max(solo ? 1 : orbSize, center ? center.drop + center.height : 0, leftCard ? shown.drop + shown.height : 0)
+    implicitWidth: scene.width + 2 * shadowRoom
+    implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
 
     mask: Region {
@@ -36,34 +38,52 @@ PanelWindow {
         Region { item: root.solo ? null : rightOrb }
     }
 
-    Loader {
-        id: cardLoader
+    Item {
+        id: scene
 
-        x: root.leftCard ? root.width / 2 - root.leftExtent : root.width / 2 - (item ? item.width : 0) / 2
-        y: item ? item.drop : 0
-        source: root.card + "Card.qml"
-    }
+        x: root.shadowRoom
+        y: root.top
+        width: Math.max(1, 2 * Math.max(root.leftExtent, root.rightExtent))
+        height: Math.max(root.solo ? 1 : root.orbSize, root.center ? root.center.drop + root.center.height : 0, root.leftCard ? root.shown.drop + root.shown.height : 0)
 
-    Loader {
-        id: idleLoader
+        layer.enabled: true
+        layer.effect: MultiEffect {
+            shadowEnabled: true
+            shadowColor: "black"
+            shadowOpacity: IslandTheme.shadowOpacity
+            shadowBlur: IslandTheme.shadowBlur
+            shadowVerticalOffset: IslandTheme.shadowOffset
+        }
 
-        active: root.leftCard
-        x: root.width / 2 - width / 2
-        source: "IdleCard.qml"
-    }
+        Loader {
+            id: cardLoader
 
-    CoverOrb {
-        id: leftOrb
+            x: root.leftCard ? scene.width / 2 - root.leftExtent : scene.width / 2 - (item ? item.width : 0) / 2
+            y: item ? item.drop : 0
+            source: root.card + "Card.qml"
+        }
 
-        visible: !root.leftCard && !root.solo
-        x: root.width / 2 - root.leftExtent
-    }
+        Loader {
+            id: idleLoader
 
-    StatusOrb {
-        id: rightOrb
+            active: root.leftCard
+            x: scene.width / 2 - width / 2
+            source: "IdleCard.qml"
+        }
 
-        visible: !root.solo
-        x: root.width / 2 + root.rightExtent - width
-        battery: root.battery
+        CoverOrb {
+            id: leftOrb
+
+            visible: !root.leftCard && !root.solo
+            x: scene.width / 2 - root.leftExtent
+        }
+
+        StatusOrb {
+            id: rightOrb
+
+            visible: !root.solo
+            x: scene.width / 2 + root.rightExtent - width
+            battery: root.battery
+        }
     }
 }

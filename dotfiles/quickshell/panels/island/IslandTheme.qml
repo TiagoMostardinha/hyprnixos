@@ -27,4 +27,8 @@ Singleton {
     readonly property int radiusSection: 12
     readonly property int radiusButton: 10
     readonly property int radiusSmall: 8
+
+    readonly property real shadowOpacity: 0.55
+    readonly property real shadowBlur: 0.5
+    readonly property int shadowOffset: 2
 }
