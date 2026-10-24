@@ -8,7 +8,7 @@ import Quickshell.Widgets
 PanelWindow {
     id: root
 
-    readonly property string card: "Launcher"
+    readonly property string card: "Desktops"
 
     readonly property int orbSize: 32
     readonly property real battery: 1.0
