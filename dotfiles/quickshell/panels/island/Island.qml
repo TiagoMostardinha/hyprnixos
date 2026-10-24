@@ -8,7 +8,7 @@ import Quickshell.Widgets
 PanelWindow {
     id: root
 
-    readonly property string card: "Media"
+    readonly property string card: "Volume"
 
     readonly property int orbSize: 32
     readonly property real battery: 1.0
@@ -41,7 +41,7 @@ PanelWindow {
     Loader {
         id: cardLoader
 
-        x: root.leftCard ? root.width / 2 - root.leftExtent : root.width / 2 - width / 2
+        x: root.leftCard ? root.width / 2 - root.leftExtent : root.width / 2 - (item ? item.width : 0) / 2
         y: item ? item.drop : 0
         source: root.card + "Card.qml"
     }
