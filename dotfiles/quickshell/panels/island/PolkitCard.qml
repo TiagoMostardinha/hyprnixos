@@ -19,24 +19,9 @@ Rectangle {
         radius: 15
         color: IslandTheme.fg
 
-        Shape {
+        LockGlyph {
             anchors.centerIn: parent
-            width: 16
-            height: 16
-            preferredRendererType: Shape.CurveRenderer
-
-            ShapePath {
-                strokeColor: IslandTheme.pill
-                strokeWidth: 1.5
-                fillColor: "transparent"
-                PathSvg { path: "M 5 7.5 V 5 A 3 3 0 0 1 11 5 V 7.5" }
-            }
-
-            ShapePath {
-                strokeColor: "transparent"
-                fillColor: IslandTheme.pill
-                PathRectangle { x: 3.5; y: 7.5; width: 9; height: 7; radius: 1.5 }
-            }
+            color: IslandTheme.pill
         }
     }
 

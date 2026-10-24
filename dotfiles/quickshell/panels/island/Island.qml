@@ -8,7 +8,7 @@ import Quickshell.Widgets
 PanelWindow {
     id: root
 
-    readonly property string card: "ControlCenter"
+    readonly property string card: "WifiBluetooth"
 
     readonly property int orbSize: 32
     readonly property real battery: 1.0

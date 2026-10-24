@@ -231,8 +231,10 @@ Rectangle {
     IconBox {
         x: 24
 
-        Stroke { strokeWidth: 1.5; d: "M 11 14 V 11 A 3 3 0 0 1 17 11 V 14" }
-        Fill { d: "M 11 14 H 17 A 1.5 1.5 0 0 1 18.5 15.5 V 19.5 A 1.5 1.5 0 0 1 17 21 H 11 A 1.5 1.5 0 0 1 9.5 19.5 V 15.5 A 1.5 1.5 0 0 1 11 14 Z" }
+        LockGlyph {
+            anchors.centerIn: parent
+            color: IslandTheme.fg2
+        }
     }
 
     IconBox {
