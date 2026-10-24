@@ -4,12 +4,12 @@ Item {
     id: row
 
     property real level
-    property real glyphX: 12
-    property real barX: 41
-    property real barWidth: 181
-    property real barHeight: 6
-    property real textMargin: 16
-    property int textSize: 12
+    property real glyphX: 10
+    property real barX: 30
+    property real barWidth: 154
+    property real barHeight: 5
+    property real textMargin: 12
+    property int textSize: IslandTheme.small
     default property alias glyph: slot.data
 
     Item {
@@ -17,8 +17,8 @@ Item {
 
         x: row.glyphX
         anchors.verticalCenter: parent.verticalCenter
-        width: 16
-        height: 16
+        width: IslandTheme.icon
+        height: IslandTheme.icon
     }
 
     LevelBar {

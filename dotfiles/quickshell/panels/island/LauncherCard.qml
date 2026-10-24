@@ -13,45 +13,44 @@ IslandCard {
     ]
     readonly property int selected: 0
 
-    width: 514
-    height: 367
+    width: 440
+    height: 258
 
     PathGlyph {
-        x: 23 - 8
-        y: 32 - 8
+        x: 12
+        y: 20 - height / 2
         color: IslandTheme.fg2
-        strokeWidth: 1.6
         stroke: "M 12 7 A 5 5 0 1 1 2 7 A 5 5 0 1 1 12 7 Z M 10.8 10.8 L 14 14"
     }
 
     Rectangle {
-        x: 44
-        y: 32 - height / 2
+        x: 31
+        y: 20 - height / 2
         width: 1.5
-        height: 18
+        height: 15
         color: IslandTheme.fg
     }
 
     IslandText {
-        x: 46
-        y: 32 - height / 2
+        x: 33
+        y: 20 - height / 2
         text: "Search..."
         tone: "muted"
-        font.pixelSize: 15
+        font.pixelSize: IslandTheme.title
     }
 
     Rectangle {
-        x: 14
-        y: 60
-        width: card.width - 28
+        x: 10
+        y: 40
+        width: card.width - 20
         height: 1
         color: IslandTheme.line
     }
 
     Column {
-        x: 14
-        y: 72
-        width: card.width - 28
+        x: 10
+        y: 46
+        width: card.width - 20
 
         Repeater {
             model: card.apps
@@ -61,23 +60,20 @@ IslandCard {
                 required property int index
 
                 width: parent.width
-                height: 46.5
-                radius: 10
+                height: 34
+                radius: IslandTheme.radiusButton
                 highlight: index === card.selected ? "subtle" : "none"
-                textX: 56
-                spacing: 1
+                textX: 38
                 title: modelData.name
-                titleSize: 15
                 titleWeight: Font.Medium
                 subtitle: modelData.description
-                subtitleSize: 12
 
                 Rectangle {
-                    x: 12
+                    x: 10
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 32
-                    height: 32
-                    radius: 9
+                    width: 20
+                    height: 20
+                    radius: 6
                     color: IslandTheme.card
                 }
             }

@@ -12,4 +12,19 @@ Singleton {
     readonly property color fg2: "#9a9a9a"
     readonly property color fg3: "#5a5a5a"
     readonly property string font: "Inter"
+
+    readonly property int tiny: 9
+    readonly property int small: 10
+    readonly property int body: 11
+    readonly property int title: 12
+    readonly property int heading: 13
+    readonly property int large: 14
+    readonly property int display: 20
+
+    readonly property int icon: 12
+
+    readonly property int radiusCard: 20
+    readonly property int radiusSection: 12
+    readonly property int radiusButton: 10
+    readonly property int radiusSmall: 8
 }

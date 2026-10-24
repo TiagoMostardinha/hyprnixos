@@ -7,16 +7,19 @@ IslandCard {
     drop: 0
     gap: 0
 
-    readonly property int sideWidth: 260
-    readonly property int sideGap: 12
-    readonly property int sideTop: 60
+    readonly property int sideWidth: 210
+    readonly property int sideGap: 10
+    readonly property real sideHeight: Math.round(center.height * 0.8)
+    readonly property real sideTop: Math.round((center.height - sideHeight) / 2)
 
     readonly property var networks: [
         { name: "HomeNet", detail: "Connected", on: true },
         { name: "Vodafone-5G", detail: "40%", on: false },
         { name: "MEO-WiFi", detail: "22%", on: false },
         { name: "NOS-A3F1", detail: "18%", on: false },
-        { name: "eduroam", detail: "12%", on: false }
+        { name: "eduroam", detail: "12%", on: false },
+        { name: "Pastelaria-Guest", detail: "9%", on: false },
+        { name: "DIRECT-HP-Printer", detail: "6%", on: false }
     ]
     readonly property var saved: [
         { name: "AirPods", detail: "Connected", on: true },
@@ -24,7 +27,8 @@ IslandCard {
     ]
     readonly property var nearby: [
         { name: "76-54-A3-…", detail: "Not paired", on: false },
-        { name: "", detail: "", on: false }
+        { name: "JBL Flip 5", detail: "Not paired", on: false },
+        { name: "Galaxy Buds2", detail: "Not paired", on: false }
     ]
 
     width: 2 * (sideWidth + sideGap) + center.width
@@ -37,16 +41,16 @@ IslandCard {
 
         y: card.sideTop
         width: card.sideWidth
-        height: 330
-        radius: 26
+        height: card.sideHeight
+        radius: IslandTheme.radiusCard
         color: IslandTheme.pill
 
         IslandText {
             id: titleText
 
-            x: 20
-            line: 32
-            font.pixelSize: 15
+            x: 14
+            line: 22
+            font.pixelSize: IslandTheme.heading
             font.weight: Font.DemiBold
         }
     }
@@ -58,17 +62,18 @@ IslandCard {
         property Component glyph
 
         width: parent.width
-        height: 54
-        radius: 16
+        height: 32
+        radius: IslandTheme.radiusButton
         fill: IslandTheme.card
         highlight: modelData.on ? "strong" : "none"
-        spacing: 4
+        textX: 28
         title: modelData.name
+        titleSize: IslandTheme.body
         subtitle: modelData.detail
+        subtitleSize: IslandTheme.tiny
 
         Loader {
-            active: entry.title !== ""
-            x: 14
+            x: 9
             anchors.verticalCenter: parent.verticalCenter
             sourceComponent: entry.glyph
             onLoaded: item.color = Qt.binding(() => entry.inverted ? IslandTheme.pill : IslandTheme.fg2)
@@ -76,14 +81,14 @@ IslandCard {
     }
 
     component SectionLabel: IslandText {
-        x: 20
+        x: 14
         tone: "muted"
-        font.pixelSize: 10
+        font.pixelSize: IslandTheme.tiny
     }
 
     component Scrollbar: Rectangle {
         width: 3
-        height: 90
+        height: 60
         radius: 1.5
         color: IslandTheme.fg3
     }
@@ -105,15 +110,15 @@ IslandCard {
         title: "Wi-Fi"
 
         Item {
-            x: 14
-            y: 50
-            width: parent.width - 34
-            height: parent.height - 14 - y
+            x: 10
+            y: 32
+            width: parent.width - 26
+            height: parent.height - 10 - y
             clip: true
 
             Column {
                 width: parent.width
-                spacing: 10
+                spacing: 6
 
                 Repeater {
                     model: card.networks
@@ -126,8 +131,8 @@ IslandCard {
         }
 
         Scrollbar {
-            x: parent.width - 14
-            y: 50
+            x: parent.width - 11
+            y: 32
         }
     }
 
@@ -142,15 +147,15 @@ IslandCard {
         title: "Bluetooth"
 
         SectionLabel {
-            line: 56
+            line: 40
             text: "saved"
         }
 
         Column {
-            x: 14
-            y: 64
-            width: parent.width - 28
-            spacing: 8
+            x: 10
+            y: 46
+            width: parent.width - 26
+            spacing: 6
 
             Repeater {
                 model: card.saved
@@ -162,20 +167,20 @@ IslandCard {
         }
 
         SectionLabel {
-            line: 206
+            line: 126
             text: "nearby"
         }
 
         Item {
-            x: 14
-            y: 214
-            width: parent.width - 28
-            height: 84
+            x: 10
+            y: 132
+            width: parent.width - 26
+            height: parent.height - 10 - y
             clip: true
 
             Column {
                 width: parent.width
-                spacing: 8
+                spacing: 6
 
                 Repeater {
                     model: card.nearby
@@ -188,8 +193,8 @@ IslandCard {
         }
 
         Scrollbar {
-            x: parent.width - 10
-            y: 64
+            x: parent.width - 11
+            y: 46
         }
     }
 }

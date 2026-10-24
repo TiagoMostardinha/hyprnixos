@@ -6,33 +6,33 @@ Item {
     property real level
     property color color: IslandTheme.fg
 
-    width: 25
-    height: 12
+    width: 21
+    height: 10
 
     Rectangle {
-        width: 22
-        height: 12
-        radius: 3.5
+        width: 19
+        height: parent.height
+        radius: 3
         color: "transparent"
         border.color: glyph.color
-        border.width: 1.5
+        border.width: 1.3
 
         Rectangle {
-            x: 2.5
+            x: 2.3
             anchors.verticalCenter: parent.verticalCenter
-            width: (parent.width - 5) * glyph.level
-            height: parent.height - 5
-            radius: 1.5
+            width: (parent.width - 4.6) * glyph.level
+            height: parent.height - 4.6
+            radius: 1.2
             color: glyph.color
         }
     }
 
     Rectangle {
-        x: 23
+        x: 19.5
         anchors.verticalCenter: parent.verticalCenter
-        width: 2
-        height: 5
-        radius: 1
+        width: 1.5
+        height: 4
+        radius: 0.75
         color: glyph.color
     }
 }

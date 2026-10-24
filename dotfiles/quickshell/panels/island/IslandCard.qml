@@ -2,9 +2,9 @@ import QtQuick
 
 Rectangle {
     property string side: "center"
-    property int drop: 6
-    property int gap: 20
+    property int drop: 4
+    property int gap: 14
 
-    radius: 30
+    radius: IslandTheme.radiusCard
     color: IslandTheme.pill
 }

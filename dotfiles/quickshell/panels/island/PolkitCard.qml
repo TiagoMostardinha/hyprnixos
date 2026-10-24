@@ -3,13 +3,13 @@ import QtQuick
 IslandCard {
     id: card
 
-    width: 430
-    height: 267
+    width: 400
+    height: field.y + field.height + 12
 
     component LockBadge: Rectangle {
-        width: 30
-        height: 30
-        radius: 15
+        width: 20
+        height: 20
+        radius: 10
         color: IslandTheme.fg
 
         LockGlyph {
@@ -19,105 +19,106 @@ IslandCard {
     }
 
     LockBadge {
-        x: 14
-        y: 15
+        x: 12
+        y: 12
     }
 
     IslandText {
-        x: 57
-        y: 30 - height / 2
+        x: 40
+        y: 22 - height / 2
         text: "Authentication required"
-        font.pixelSize: 16
+        font.pixelSize: IslandTheme.heading
         font.weight: Font.Medium
     }
 
     Rectangle {
-        x: 15
-        y: 56
-        width: card.width - 30
-        height: 73
-        radius: 14
+        id: message
+
+        x: 12
+        y: 40
+        width: card.width - 24
+        height: details.height + 16
+        radius: IslandTheme.radiusSection
         color: IslandTheme.card
         border.color: IslandTheme.card2
         border.width: 1
 
         Column {
-            x: 11
-            y: 9
-            width: parent.width - 22
+            id: details
+
+            x: 10
+            y: 8
+            width: parent.width - 20
             spacing: 2
 
             IslandText {
                 width: parent.width
                 text: "Authentication is needed to run `/usr/bin/true' as the super user"
                 wrapMode: Text.WordWrap
-                font.pixelSize: 13
                 font.weight: Font.DemiBold
             }
 
             IslandText {
                 text: "org.freedesktop.policykit.exec"
                 tone: "secondary"
-                font.pixelSize: 11
+                font.pixelSize: IslandTheme.small
             }
         }
     }
 
     IslandText {
-        x: 15
-        y: 148 - height / 2
+        x: 14
+        line: message.y + message.height + 18
         text: "Password"
         tone: "muted"
-        font.pixelSize: 11
+        font.pixelSize: IslandTheme.small
     }
 
     Rectangle {
-        x: 15
-        y: 169
-        width: card.width - 30
-        height: 40
-        radius: height / 2
+        id: field
+
+        x: 12
+        y: message.y + message.height + 24
+        width: authenticate.x - x - 6
+        height: 28
+        radius: IslandTheme.radiusButton
         color: IslandTheme.pill
         border.color: IslandTheme.fg3
         border.width: 1
 
-        LockBadge {
-            x: 5
+        LockGlyph {
+            x: 8
             anchors.verticalCenter: parent.verticalCenter
+            color: IslandTheme.fg2
         }
 
         Row {
-            x: 47
+            x: 26
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
 
             IslandText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "••••••••••"
-                font.pixelSize: 12
                 font.letterSpacing: 1
             }
 
             Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 width: 1.5
-                height: 18
+                height: 15
                 color: IslandTheme.fg
             }
         }
     }
 
     PillButton {
-        x: 224
-        y: 222
-        width: 73
-        label: "Cancel"
-    }
+        id: authenticate
 
-    PillButton {
-        x: 305
-        y: 222
-        width: 111
+        x: card.width - 12 - width
+        y: field.y
+        width: 92
+        height: field.height
         label: "Authenticate"
         emphasis: "primary"
     }

@@ -6,8 +6,8 @@ IslandCard {
     required property real level
     default property alias glyph: row.glyph
 
-    width: 270
-    height: 44
+    width: 230
+    height: 30
     radius: height / 2
 
     LevelRow {

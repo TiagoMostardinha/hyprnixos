@@ -1,16 +1,16 @@
 import QtQuick
 
 Rectangle {
-    width: 32
-    height: 32
-    radius: 16
+    width: 28
+    height: width
+    radius: width / 2
     color: IslandTheme.pill
 
     Rectangle {
         anchors.centerIn: parent
-        width: 22
-        height: 22
-        radius: 7
+        width: parent.width - 10
+        height: width
+        radius: 6
         color: IslandTheme.card2
     }
 }

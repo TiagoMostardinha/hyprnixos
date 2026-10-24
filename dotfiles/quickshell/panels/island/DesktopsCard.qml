@@ -5,32 +5,32 @@ IslandCard {
 
     readonly property int count: 5
     readonly property int current: 2
-    readonly property int pitch: 186
+    readonly property int pitch: 140
 
-    width: 620
-    height: 190
+    width: 520
+    height: 132
 
     IslandText {
-        x: 24
-        line: 36
+        x: 16
+        line: 24
         text: "Desktops"
-        font.pixelSize: 15
+        font.pixelSize: IslandTheme.heading
         font.weight: Font.DemiBold
     }
 
     IslandText {
-        x: card.width - 24 - width
-        line: 36
+        x: card.width - 16 - width
+        line: 24
         text: card.current + " / " + card.count
         tone: "secondary"
-        font.pixelSize: 11
+        font.pixelSize: IslandTheme.small
     }
 
     Item {
-        x: 14
-        y: 50
-        width: card.width - 28
-        height: 110
+        x: 10
+        y: 34
+        width: card.width - 20
+        height: 74
         clip: true
 
         Repeater {
@@ -43,38 +43,37 @@ IslandCard {
                 readonly property int workspace: (card.current - 1 + modelData + card.count) % card.count + 1
 
                 x: parent.width / 2 + modelData * card.pitch - width / 2
-                y: 8
-                width: 170
-                height: 96
-                radius: 14
+                y: 4
+                width: 130
+                height: 66
+                radius: IslandTheme.radiusSection
                 color: isCurrent ? IslandTheme.card2 : IslandTheme.card
                 border.color: IslandTheme.fg
                 border.width: isCurrent ? 2 : 0
 
                 IslandText {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    line: 54
+                    anchors.centerIn: parent
                     text: "workspace " + parent.workspace
                     tone: parent.isCurrent ? "primary" : "muted"
-                    font.pixelSize: 11
+                    font.pixelSize: IslandTheme.small
                 }
             }
         }
     }
 
     IslandText {
-        x: 24
-        line: 176
+        x: 16
+        line: 122
         text: "← →  rotates (wraps around)"
         tone: "muted"
-        font.pixelSize: 10
+        font.pixelSize: IslandTheme.tiny
     }
 
     IslandText {
-        x: card.width - 24 - width
-        line: 176
+        x: card.width - 16 - width
+        line: 122
         text: "Enter to apply"
         tone: "muted"
-        font.pixelSize: 10
+        font.pixelSize: IslandTheme.tiny
     }
 }

@@ -1,31 +1,27 @@
 import QtQuick
 
 IslandCard {
-    width: 449
-    height: 68
+    width: 360
+    height: 48
 
     ListRow {
         anchors.fill: parent
-        textX: 59
+        textX: 40
         overline: "notify-send"
-        overlineSize: 12
         title: "hello"
-        titleSize: 14
         subtitle: "hi"
-        subtitleSize: 12
 
         Rectangle {
-            x: 11
+            x: 10
             anchors.verticalCenter: parent.verticalCenter
-            width: 36
-            height: 36
-            radius: 18
+            width: 24
+            height: 24
+            radius: 12
             color: IslandTheme.card
 
             IslandText {
                 anchors.centerIn: parent
                 text: "N"
-                font.pixelSize: 13
                 font.weight: Font.DemiBold
             }
         }

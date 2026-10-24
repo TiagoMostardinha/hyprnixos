@@ -14,30 +14,29 @@ IslandCard {
     ]
     readonly property int today: 3
 
-    width: 254
-    height: 116
-    radius: 28
+    width: 210
+    height: 84
 
     IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 18
+        y: 10
         text: "00:47"
-        font.pixelSize: 26
+        font.pixelSize: IslandTheme.display
         font.weight: Font.Medium
     }
 
     Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 62
-        width: 32
-        height: 40
-        radius: 9
+        y: 40
+        width: 28
+        height: 34
+        radius: IslandTheme.radiusSmall
         color: IslandTheme.card
     }
 
     Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        y: 64
+        y: 42
 
         Repeater {
             model: card.week
@@ -49,25 +48,24 @@ IslandCard {
                 readonly property int distance: Math.abs(index - card.today)
                 readonly property bool isToday: distance === 0
 
-                width: 28
-                spacing: 2
+                width: 26
                 opacity: [1, 0.75, 0.45, 0.2][distance]
 
                 IslandText {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: parent.modelData.label
                     tone: parent.isToday ? "secondary" : "muted"
-                    font.pixelSize: 10
+                    font.pixelSize: IslandTheme.tiny
                     font.weight: Font.DemiBold
                 }
 
                 IslandText {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    height: 20
+                    height: 18
                     verticalAlignment: Text.AlignVCenter
                     text: parent.modelData.day
                     tone: parent.isToday ? "primary" : "secondary"
-                    font.pixelSize: parent.isToday ? 18 : 13
+                    font.pixelSize: parent.isToday ? IslandTheme.large : IslandTheme.body
                     font.weight: parent.isToday ? Font.DemiBold : Font.Medium
                 }
             }

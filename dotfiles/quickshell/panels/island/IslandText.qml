@@ -6,6 +6,7 @@ Text {
 
     color: tone === "secondary" ? IslandTheme.fg2 : tone === "muted" ? IslandTheme.fg3 : IslandTheme.fg
     font.family: IslandTheme.font
+    font.pixelSize: IslandTheme.body
 
     Binding on y {
         when: !isNaN(line)

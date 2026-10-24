@@ -5,10 +5,10 @@ import Quickshell.Wayland
 PanelWindow {
     id: root
 
-    readonly property string card: "WifiBluetooth"
+    readonly property string card: "Idle"
 
-    readonly property int orbSize: 32
-    readonly property real battery: 1.0
+    readonly property int orbSize: 28
+    readonly property real battery: 0.75
 
     readonly property Item shown: cardLoader.item
     readonly property bool leftCard: shown?.side === "left"
@@ -21,7 +21,7 @@ PanelWindow {
 
     screen: Quickshell.screens.find(s => s.name === "eDP-1") ?? null
     anchors.top: true
-    margins.top: 10
+    margins.top: 8
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
