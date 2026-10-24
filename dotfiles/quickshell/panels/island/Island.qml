@@ -8,18 +8,19 @@ import Quickshell.Widgets
 PanelWindow {
     id: root
 
-    readonly property string card: "Desktops"
+    readonly property string card: "Gateway"
 
     readonly property int orbSize: 32
     readonly property real battery: 1.0
 
     readonly property Item shown: cardLoader.item
     readonly property bool leftCard: shown?.side === "left"
+    readonly property bool solo: shown?.side === "solo"
     readonly property Item center: leftCard ? idleLoader.item : shown
     readonly property Item left: leftCard ? shown : leftOrb
 
-    readonly property real leftExtent: center ? center.width / 2 + (leftCard ? shown.gap : center.gap) + left.width : 0
-    readonly property real rightExtent: center ? center.width / 2 + center.gap + orbSize : 0
+    readonly property real leftExtent: solo ? center.width / 2 : center ? center.width / 2 + (leftCard ? shown.gap : center.gap) + left.width : 0
+    readonly property real rightExtent: solo ? center.width / 2 : center ? center.width / 2 + center.gap + orbSize : 0
 
     screen: Quickshell.screens.find(s => s.name === "eDP-1") ?? null
     anchors.top: true
@@ -29,13 +30,13 @@ PanelWindow {
     WlrLayershell.namespace: "island"
 
     implicitWidth: Math.max(1, 2 * Math.max(leftExtent, rightExtent))
-    implicitHeight: Math.max(orbSize, center ? center.drop + center.height : 0, leftCard ? shown.drop + shown.height : 0)
+    implicitHeight: Math.max(solo ? 1 : orbSize, center ? center.drop + center.height : 0, leftCard ? shown.drop + shown.height : 0)
     color: "transparent"
 
     mask: Region {
-        Region { item: root.left }
+        Region { item: root.solo ? null : root.left }
         Region { item: root.center }
-        Region { item: rightOrb }
+        Region { item: root.solo ? null : rightOrb }
     }
 
     Loader {
@@ -57,7 +58,7 @@ PanelWindow {
     Rectangle {
         id: leftOrb
 
-        visible: !root.leftCard
+        visible: !root.leftCard && !root.solo
         x: root.width / 2 - root.leftExtent
         width: root.orbSize
         height: width
@@ -76,6 +77,7 @@ PanelWindow {
     Rectangle {
         id: rightOrb
 
+        visible: !root.solo
         x: root.width / 2 + root.rightExtent - width
         width: root.orbSize
         height: width
