@@ -8,7 +8,7 @@ import Quickshell.Widgets
 PanelWindow {
     id: root
 
-    readonly property string card: "Volume"
+    readonly property string card: "Polkit"
 
     readonly property int orbSize: 32
     readonly property real battery: 1.0
