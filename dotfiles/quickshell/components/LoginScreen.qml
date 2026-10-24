@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import "../theme"
 import "../services"
 
@@ -17,6 +18,13 @@ Item {
         source: Theme.wallpaper
         sourceSize.width: width
         fillMode: Image.PreserveAspectCrop
+        layer.enabled: true
+        layer.effect: MultiEffect {
+            autoPaddingEnabled: false
+            blurEnabled: true
+            blur: 1
+            blurMax: Theme.wallpaperBlur
+        }
     }
 
     DateClock {

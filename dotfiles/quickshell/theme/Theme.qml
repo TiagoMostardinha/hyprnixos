@@ -5,6 +5,7 @@ import Quickshell
 
 Singleton {
     readonly property url wallpaper: Qt.resolvedUrl("../assets/wallpaper.jpg")
+    readonly property int wallpaperBlur: 48
     readonly property string fontFamily: "Inter"
     readonly property color text: "#ffffff"
     readonly property color textClock: "#e6ffffff"

@@ -46,4 +46,4 @@ hl.gesture({
     action    = "workspace",
 })
 
-dofile(os.getenv("HOME") .. "/.config/hypr/host.lua")
+pcall(dofile, os.getenv("HOME") .. "/.config/hypr/host.lua")

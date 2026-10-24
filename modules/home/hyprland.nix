@@ -12,6 +12,7 @@ in
     "hypr/rules.lua".source = link "rules.lua";
     "hypr/hyprpaper.conf".source = link "hyprpaper.conf";
     "hypr/hyprtoolkit.conf".source = link "hyprtoolkit.conf";
+    "hypr/hypridle.conf".source = link "hypridle.conf";
 
     "uwsm/env".text = ''
       export HYPRCURSOR_THEME=oblique-cursor
@@ -43,6 +44,8 @@ in
     enable = true;
     settings = { };
   };
+
+  services.hypridle.enable = true;
 
   services.hyprpolkitagent.enable = true;
 }
