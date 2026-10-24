@@ -1,11 +1,7 @@
 import QtQuick
 
-Rectangle {
+IslandCard {
     id: card
-
-    readonly property string side: "center"
-    readonly property int drop: 6
-    readonly property int gap: 20
 
     readonly property int count: 5
     readonly property int current: 2
@@ -13,30 +9,20 @@ Rectangle {
 
     width: 620
     height: 190
-    radius: 30
-    color: IslandTheme.pill
 
-    component Label: Text {
-        property real line
-
-        y: line - baselineOffset
-        font.family: IslandTheme.font
-    }
-
-    Label {
+    IslandText {
         x: 24
         line: 36
         text: "Desktops"
-        color: IslandTheme.fg
         font.pixelSize: 15
         font.weight: Font.DemiBold
     }
 
-    Label {
+    IslandText {
         x: card.width - 24 - width
         line: 36
         text: card.current + " / " + card.count
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 11
     }
 
@@ -65,30 +51,30 @@ Rectangle {
                 border.color: IslandTheme.fg
                 border.width: isCurrent ? 2 : 0
 
-                Label {
+                IslandText {
                     anchors.horizontalCenter: parent.horizontalCenter
                     line: 54
                     text: "workspace " + parent.workspace
-                    color: parent.isCurrent ? IslandTheme.fg : IslandTheme.fg3
+                    tone: parent.isCurrent ? "primary" : "muted"
                     font.pixelSize: 11
                 }
             }
         }
     }
 
-    Label {
+    IslandText {
         x: 24
         line: 176
         text: "← →  rotates (wraps around)"
-        color: IslandTheme.fg3
+        tone: "muted"
         font.pixelSize: 10
     }
 
-    Label {
+    IslandText {
         x: card.width - 24 - width
         line: 176
         text: "Enter to apply"
-        color: IslandTheme.fg3
+        tone: "muted"
         font.pixelSize: 10
     }
 }

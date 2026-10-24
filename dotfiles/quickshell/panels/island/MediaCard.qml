@@ -1,53 +1,11 @@
 import QtQuick
-import QtQuick.Shapes
 
-Rectangle {
-    id: card
-
-    readonly property string side: "left"
-    readonly property int drop: 6
-    readonly property int gap: 12
-
-    readonly property real progress: 0.7
+IslandCard {
+    side: "left"
+    gap: 12
 
     width: 380
     height: 160
-    radius: 30
-    color: IslandTheme.pill
-
-    component Label: Text {
-        property real line
-
-        x: 160
-        y: line - baselineOffset
-        font.family: IslandTheme.font
-    }
-
-    component Glyph: Shape {
-        id: glyph
-
-        property var points: []
-        property real barX: -1
-
-        width: 9
-        height: 9
-        preferredRendererType: Shape.CurveRenderer
-
-        ShapePath {
-            fillColor: IslandTheme.fg
-            strokeColor: "transparent"
-            PathPolyline { path: glyph.points }
-        }
-
-        Rectangle {
-            visible: glyph.barX >= 0
-            x: glyph.barX
-            width: 1.6
-            height: glyph.height
-            radius: 0.5
-            color: IslandTheme.fg
-        }
-    }
 
     Rectangle {
         x: 16
@@ -58,94 +16,90 @@ Rectangle {
         color: IslandTheme.card2
     }
 
-    Label {
+    IslandText {
+        x: 160
         line: 38
         text: "Wallflower"
-        color: IslandTheme.fg
         font.pixelSize: 16
         font.weight: Font.DemiBold
     }
 
-    Label {
+    IslandText {
+        x: 160
         line: 56
         text: "Dominic Fike"
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 12
     }
 
-    Label {
+    IslandText {
+        x: 160
         line: 74
         text: "How To Quit Smoking"
-        color: IslandTheme.fg3
+        tone: "muted"
         font.pixelSize: 11
     }
 
-    Label {
+    IslandText {
+        x: 160
         line: 92
         text: "Spotify"
-        color: IslandTheme.fg3
+        tone: "muted"
         font.pixelSize: 11
     }
 
-    Rectangle {
+    LevelBar {
         x: 160
         y: 104
         width: 200
         height: 5
-        radius: 2.5
-        color: IslandTheme.card2
-
-        Rectangle {
-            width: parent.width * card.progress
-            height: parent.height
-            radius: parent.radius
-            color: IslandTheme.fg
-        }
+        level: 0.7
     }
 
-    Label {
+    IslandText {
+        x: 160
         line: 122
         text: "2:06"
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 9
     }
 
-    Label {
+    IslandText {
         x: 360 - width
         line: 122
         text: "2:58"
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 9
     }
 
-    Glyph {
+    PathGlyph {
         x: 231.7
         y: 133.5
-        points: [Qt.point(8.8, 0), Qt.point(1.6, 4.5), Qt.point(8.8, 9)]
-        barX: 0
+        width: 9
+        height: 9
+        fill: "M 8.8 0 L 1.6 4.5 L 8.8 9 Z M 0 0 H 1.6 V 9 H 0 Z"
     }
 
-    Rectangle {
+    PillButton {
         x: 257
         y: 125
         width: 26
         height: 26
-        radius: 13
-        color: IslandTheme.card2
 
-        Glyph {
+        PathGlyph {
             x: 11
             y: 8
             width: 8
             height: 10
-            points: [Qt.point(0, 0), Qt.point(8, 5), Qt.point(0, 10)]
+            fill: "M 0 0 L 8 5 L 0 10 Z"
         }
     }
 
-    Glyph {
+    PathGlyph {
         x: 299.5
         y: 133.5
-        points: [Qt.point(0, 0), Qt.point(7.2, 4.5), Qt.point(0, 9)]
-        barX: 7.2
+        width: 9
+        height: 9
+        fill: "M 0 0 L 7.2 4.5 L 0 9 Z M 7.2 0 H 8.8 V 9 H 7.2 Z"
     }
 }

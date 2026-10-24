@@ -1,9 +1,6 @@
 import QtQuick
-import QtQuick.Effects
-import QtQuick.Shapes
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Widgets
 
 PanelWindow {
     id: root
@@ -55,74 +52,18 @@ PanelWindow {
         source: "IdleCard.qml"
     }
 
-    Rectangle {
+    CoverOrb {
         id: leftOrb
 
         visible: !root.leftCard && !root.solo
         x: root.width / 2 - root.leftExtent
-        width: root.orbSize
-        height: width
-        radius: width / 2
-        color: IslandTheme.pill
-
-        Rectangle {
-            anchors.centerIn: parent
-            width: 22
-            height: width
-            radius: 7
-            color: IslandTheme.card2
-        }
     }
 
-    Rectangle {
+    StatusOrb {
         id: rightOrb
 
         visible: !root.solo
         x: root.width / 2 + root.rightExtent - width
-        width: root.orbSize
-        height: width
-        radius: width / 2
-        color: IslandTheme.pill
-
-        Shape {
-            anchors.fill: parent
-            preferredRendererType: Shape.CurveRenderer
-
-            ShapePath {
-                strokeColor: IslandTheme.line
-                strokeWidth: 2
-                fillColor: "transparent"
-                PathAngleArc { centerX: 16; centerY: 16; radiusX: 12.5; radiusY: 12.5; startAngle: 0; sweepAngle: 360 }
-            }
-
-            ShapePath {
-                strokeColor: IslandTheme.fg
-                strokeWidth: 2
-                fillColor: "transparent"
-                capStyle: ShapePath.RoundCap
-                PathAngleArc { centerX: 16; centerY: 16; radiusX: 12.5; radiusY: 12.5; startAngle: -90; sweepAngle: root.battery * 360 }
-            }
-        }
-
-        IconImage {
-            id: wifiIcon
-            anchors.centerIn: parent
-            implicitSize: 14
-            source: Quickshell.iconPath("network-wireless-signal-excellent-symbolic")
-            visible: false
-            layer.enabled: true
-        }
-
-        Rectangle {
-            anchors.fill: wifiIcon
-            color: IslandTheme.fg
-            layer.enabled: true
-            layer.effect: MultiEffect {
-                maskEnabled: true
-                maskSource: wifiIcon
-                maskThresholdMin: 0.5
-                maskSpreadAtMin: 1.0
-            }
-        }
+        battery: root.battery
     }
 }

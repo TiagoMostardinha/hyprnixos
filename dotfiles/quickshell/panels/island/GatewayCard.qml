@@ -1,63 +1,30 @@
 import QtQuick
-import QtQuick.Shapes
 
-Rectangle {
+IslandCard {
     id: card
 
-    readonly property string side: "solo"
-    readonly property int drop: 0
-    readonly property int gap: 0
+    side: "solo"
+    drop: 0
+    gap: 0
 
     readonly property real battery: 0.72
 
     width: 460
     height: 190
     radius: 26
-    color: IslandTheme.pill
-
-    component Label: Text {
-        property real line
-
-        y: line - baselineOffset
-        font.family: IslandTheme.font
-    }
 
     component IconBox: Rectangle {
-        default property alias paths: glyph.data
-
         y: 146
         width: 28
         height: 28
         radius: 8
         color: IslandTheme.card2
-
-        Shape {
-            id: glyph
-
-            anchors.fill: parent
-            preferredRendererType: Shape.CurveRenderer
-        }
     }
 
-    component Stroke: ShapePath {
-        property alias d: svg.path
-
-        strokeColor: IslandTheme.fg2
+    component BoxGlyph: PathGlyph {
+        anchors.centerIn: parent
+        color: IslandTheme.fg2
         strokeWidth: 1.6
-        fillColor: "transparent"
-        capStyle: ShapePath.RoundCap
-
-        PathSvg { id: svg }
-    }
-
-    component Fill: ShapePath {
-        property alias d: svg.path
-        property color color: IslandTheme.fg2
-
-        strokeColor: "transparent"
-        fillColor: color
-
-        PathSvg { id: svg }
     }
 
     Rectangle {
@@ -74,30 +41,27 @@ Rectangle {
         y: 42 - user.baselineOffset
         spacing: 6
 
-        Text {
+        IslandText {
             id: user
 
             text: "tiago"
-            color: IslandTheme.fg
-            font.family: IslandTheme.font
             font.pixelSize: 16
             font.weight: Font.DemiBold
         }
 
-        Text {
+        IslandText {
             anchors.baseline: user.baseline
             text: "(latitude-7340)"
-            color: IslandTheme.fg2
-            font.family: IslandTheme.font
+            tone: "secondary"
             font.pixelSize: 12
         }
     }
 
-    Label {
+    IslandText {
         x: 86
         line: 62
         text: "up 2 hours, 23 minutes"
-        color: IslandTheme.fg3
+        tone: "muted"
         font.pixelSize: 11
     }
 
@@ -107,45 +71,15 @@ Rectangle {
         y: 44 - percent.baselineOffset
         spacing: 7
 
-        Item {
+        BatteryGlyph {
             anchors.verticalCenter: percent.verticalCenter
-            width: 25
-            height: 12
-
-            Rectangle {
-                width: 22
-                height: 12
-                radius: 3.5
-                color: "transparent"
-                border.color: IslandTheme.fg
-                border.width: 1.5
-
-                Rectangle {
-                    x: 2.5
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: (parent.width - 5) * card.battery
-                    height: parent.height - 5
-                    radius: 1.5
-                    color: IslandTheme.fg
-                }
-            }
-
-            Rectangle {
-                x: 23
-                anchors.verticalCenter: parent.verticalCenter
-                width: 2
-                height: 5
-                radius: 1
-                color: IslandTheme.fg
-            }
+            level: card.battery
         }
 
-        Text {
+        IslandText {
             id: percent
 
             text: Math.round(card.battery * 100) + "%"
-            color: IslandTheme.fg
-            font.family: IslandTheme.font
             font.pixelSize: 16
             font.weight: Font.DemiBold
         }
@@ -160,20 +94,19 @@ Rectangle {
         color: IslandTheme.fg
     }
 
-    Label {
+    IslandText {
         x: 46
         line: 102
         text: "192.168.1.30"
-        color: IslandTheme.fg
         font.pixelSize: 14
         font.weight: Font.DemiBold
     }
 
-    Label {
+    IslandText {
         x: 24
         line: 124
         text: "eth0"
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 11
     }
 
@@ -194,28 +127,27 @@ Rectangle {
             color: IslandTheme.fg
         }
 
-        Label {
+        IslandText {
             x: 18
             line: 12
             text: "tailscale"
-            color: IslandTheme.fg2
+            tone: "secondary"
             font.pixelSize: 9
         }
     }
 
-    Label {
+    IslandText {
         x: card.width - 24 - width
         line: 102
         text: "↓ 407 MB"
-        color: IslandTheme.fg
         font.pixelSize: 12
     }
 
-    Label {
+    IslandText {
         x: card.width - 24 - width
         line: 122
         text: "↑ 46 MB"
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 12
     }
 
@@ -240,29 +172,32 @@ Rectangle {
     IconBox {
         x: 58
 
-        Fill { d: "M 8 15 A 6 6 0 1 0 20 15 A 6 6 0 1 0 8 15 Z" }
-        Fill { color: IslandTheme.card2; d: "M 11.5 13 A 5.5 5.5 0 1 0 22.5 13 A 5.5 5.5 0 1 0 11.5 13 Z" }
+        BoxGlyph {
+            fill: "M 7.162 3.058 A 6 6 0 1 0 13.164 12.056 A 5.5 5.5 0 0 1 7.162 3.058 Z"
+        }
     }
 
-    Label {
+    IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         line: 165
         text: "01:51  Sat, 24 Oct 2026"
-        color: IslandTheme.fg2
+        tone: "secondary"
         font.pixelSize: 11
     }
 
     IconBox {
         x: card.width - 86
 
-        Stroke { d: "M 19 15 A 5 5 0 1 1 16 10.5" }
-        Stroke { d: "M 15 7.5 L 18 10.5 L 14 12.5" }
+        BoxGlyph {
+            stroke: "M 13 9 A 5 5 0 1 1 10 4.5 M 9 1.5 L 12 4.5 L 8 6.5"
+        }
     }
 
     IconBox {
         x: card.width - 52
 
-        Stroke { d: "M 17.5 11 A 5.5 5.5 0 1 1 10.5 11" }
-        Stroke { d: "M 14 8 V 14" }
+        BoxGlyph {
+            stroke: "M 11.5 5 A 5.5 5.5 0 1 1 4.5 5 M 8 2 V 8"
+        }
     }
 }

@@ -1,11 +1,11 @@
 import QtQuick
 
-Item {
+IslandCard {
     id: card
 
-    readonly property string side: "solo"
-    readonly property int drop: 0
-    readonly property int gap: 0
+    side: "solo"
+    drop: 0
+    gap: 0
 
     readonly property int sideWidth: 260
     readonly property int sideGap: 12
@@ -29,16 +29,11 @@ Item {
 
     width: 2 * (sideWidth + sideGap) + center.width
     height: center.height
-
-    component Label: Text {
-        property real line
-
-        y: line - baselineOffset
-        font.family: IslandTheme.font
-    }
+    radius: 0
+    color: "transparent"
 
     component Panel: Rectangle {
-        property alias title: titleLabel.text
+        property alias title: titleText.text
 
         y: card.sideTop
         width: card.sideWidth
@@ -46,51 +41,44 @@ Item {
         radius: 26
         color: IslandTheme.pill
 
-        Label {
-            id: titleLabel
+        IslandText {
+            id: titleText
 
             x: 20
             line: 32
-            color: IslandTheme.fg
             font.pixelSize: 15
             font.weight: Font.DemiBold
         }
     }
 
-    component Row: Rectangle {
-        id: row
+    component Entry: ListRow {
+        id: entry
 
         required property var modelData
         property Component glyph
 
+        width: parent.width
         height: 54
         radius: 16
-        color: modelData.on ? IslandTheme.fg : IslandTheme.card
+        fill: IslandTheme.card
+        highlight: modelData.on ? "strong" : "none"
+        spacing: 4
+        title: modelData.name
+        subtitle: modelData.detail
 
         Loader {
-            active: row.modelData.name !== ""
-            x: 22 - 8
-            y: 27 - 8
-            sourceComponent: row.glyph
-            onLoaded: item.color = row.modelData.on ? IslandTheme.pill : IslandTheme.fg2
+            active: entry.title !== ""
+            x: 14
+            anchors.verticalCenter: parent.verticalCenter
+            sourceComponent: entry.glyph
+            onLoaded: item.color = Qt.binding(() => entry.inverted ? IslandTheme.pill : IslandTheme.fg2)
         }
+    }
 
-        Label {
-            x: 42
-            line: 24
-            text: row.modelData.name
-            color: row.modelData.on ? IslandTheme.pill : IslandTheme.fg
-            font.pixelSize: 13
-            font.weight: Font.DemiBold
-        }
-
-        Label {
-            x: 42
-            line: 41
-            text: row.modelData.detail
-            color: row.modelData.on ? IslandTheme.card2 : IslandTheme.fg2
-            font.pixelSize: 10
-        }
+    component SectionLabel: IslandText {
+        x: 20
+        tone: "muted"
+        font.pixelSize: 10
     }
 
     component Scrollbar: Rectangle {
@@ -130,8 +118,7 @@ Item {
                 Repeater {
                     model: card.networks
 
-                    Row {
-                        width: parent.width
+                    Entry {
                         glyph: lock
                     }
                 }
@@ -154,12 +141,9 @@ Item {
         x: card.width - width
         title: "Bluetooth"
 
-        Label {
-            x: 20
+        SectionLabel {
             line: 56
             text: "saved"
-            color: IslandTheme.fg3
-            font.pixelSize: 10
         }
 
         Column {
@@ -171,19 +155,15 @@ Item {
             Repeater {
                 model: card.saved
 
-                Row {
-                    width: parent.width
+                Entry {
                     glyph: bluetooth
                 }
             }
         }
 
-        Label {
-            x: 20
+        SectionLabel {
             line: 206
             text: "nearby"
-            color: IslandTheme.fg3
-            font.pixelSize: 10
         }
 
         Item {
@@ -200,8 +180,7 @@ Item {
                 Repeater {
                     model: card.nearby
 
-                    Row {
-                        width: parent.width
+                    Entry {
                         glyph: bluetooth
                     }
                 }

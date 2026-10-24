@@ -1,11 +1,7 @@
 import QtQuick
 
-Rectangle {
+IslandCard {
     id: card
-
-    readonly property string side: "center"
-    readonly property int drop: 6
-    readonly property int gap: 20
 
     readonly property var week: [
         { label: "W", day: 9 },
@@ -21,14 +17,11 @@ Rectangle {
     width: 254
     height: 116
     radius: 28
-    color: IslandTheme.pill
 
-    Text {
+    IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         y: 18
         text: "00:47"
-        color: IslandTheme.fg
-        font.family: IslandTheme.font
         font.pixelSize: 26
         font.weight: Font.Medium
     }
@@ -60,22 +53,20 @@ Rectangle {
                 spacing: 2
                 opacity: [1, 0.75, 0.45, 0.2][distance]
 
-                Text {
+                IslandText {
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: parent.modelData.label
-                    color: parent.isToday ? IslandTheme.fg2 : IslandTheme.fg3
-                    font.family: IslandTheme.font
+                    tone: parent.isToday ? "secondary" : "muted"
                     font.pixelSize: 10
                     font.weight: Font.DemiBold
                 }
 
-                Text {
+                IslandText {
                     anchors.horizontalCenter: parent.horizontalCenter
                     height: 20
                     verticalAlignment: Text.AlignVCenter
                     text: parent.modelData.day
-                    color: parent.isToday ? IslandTheme.fg : IslandTheme.fg2
-                    font.family: IslandTheme.font
+                    tone: parent.isToday ? "primary" : "secondary"
                     font.pixelSize: parent.isToday ? 18 : 13
                     font.weight: parent.isToday ? Font.DemiBold : Font.Medium
                 }

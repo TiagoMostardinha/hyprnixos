@@ -1,11 +1,7 @@
 import QtQuick
 
-Rectangle {
+IslandCard {
     id: card
-
-    readonly property string side: "center"
-    readonly property int drop: 6
-    readonly property int gap: 20
 
     readonly property int month: 8
     readonly property int today: 12
@@ -19,8 +15,6 @@ Rectangle {
 
     width: 336
     height: 280
-    radius: 30
-    color: IslandTheme.pill
 
     Repeater {
         model: [
@@ -28,32 +22,24 @@ Rectangle {
             { x: card.width - 28, glyph: "→" }
         ]
 
-        Rectangle {
+        PillButton {
             required property var modelData
 
             x: modelData.x - width / 2
             y: 30 - height / 2
             width: 28
             height: 28
-            radius: 14
-            color: IslandTheme.card
-
-            Text {
-                anchors.centerIn: parent
-                text: parent.modelData.glyph
-                color: IslandTheme.fg
-                font.family: IslandTheme.font
-                font.pixelSize: 13
-            }
+            emphasis: "quiet"
+            label: modelData.glyph
+            labelColor: IslandTheme.fg
+            labelWeight: Font.Normal
         }
     }
 
-    Text {
+    IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         y: 30 - height / 2
         text: "September 2026"
-        color: IslandTheme.fg
-        font.family: IslandTheme.font
         font.pixelSize: 14
         font.weight: Font.DemiBold
     }
@@ -61,15 +47,14 @@ Rectangle {
     Repeater {
         model: ["S", "M", "T", "W", "T", "F", "S"]
 
-        Text {
+        IslandText {
             required property string modelData
             required property int index
 
             x: card.columnStart + index * card.columnStep - width / 2
             y: 60 - height / 2
             text: modelData
-            color: IslandTheme.fg2
-            font.family: IslandTheme.font
+            tone: "secondary"
             font.pixelSize: 11
         }
     }
@@ -99,11 +84,10 @@ Rectangle {
                 color: IslandTheme.fg
             }
 
-            Text {
+            IslandText {
                 anchors.centerIn: parent
                 text: cell.date.getDate()
                 color: cell.isToday ? IslandTheme.pill : cell.inMonth ? IslandTheme.fg : IslandTheme.fg3
-                font.family: IslandTheme.font
                 font.pixelSize: 13
                 font.weight: cell.isToday ? Font.Bold : Font.Normal
             }

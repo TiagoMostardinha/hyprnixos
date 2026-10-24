@@ -1,17 +1,10 @@
 import QtQuick
-import QtQuick.Shapes
 
-Rectangle {
+IslandCard {
     id: card
-
-    readonly property string side: "center"
-    readonly property int drop: 6
-    readonly property int gap: 20
 
     width: 430
     height: 267
-    radius: 30
-    color: IslandTheme.pill
 
     component LockBadge: Rectangle {
         width: 30
@@ -25,36 +18,15 @@ Rectangle {
         }
     }
 
-    component Button: Rectangle {
-        property alias label: buttonText.text
-        property bool primary: false
-
-        height: 31
-        radius: height / 2
-        color: primary ? IslandTheme.fg : IslandTheme.card2
-
-        Text {
-            id: buttonText
-
-            anchors.centerIn: parent
-            color: parent.primary ? IslandTheme.pill : IslandTheme.fg
-            font.family: IslandTheme.font
-            font.pixelSize: 13
-            font.weight: Font.DemiBold
-        }
-    }
-
     LockBadge {
         x: 14
         y: 15
     }
 
-    Text {
+    IslandText {
         x: 57
         y: 30 - height / 2
         text: "Authentication required"
-        color: IslandTheme.fg
-        font.family: IslandTheme.font
         font.pixelSize: 16
         font.weight: Font.Medium
     }
@@ -75,31 +47,27 @@ Rectangle {
             width: parent.width - 22
             spacing: 2
 
-            Text {
+            IslandText {
                 width: parent.width
                 text: "Authentication is needed to run `/usr/bin/true' as the super user"
                 wrapMode: Text.WordWrap
-                color: IslandTheme.fg
-                font.family: IslandTheme.font
                 font.pixelSize: 13
                 font.weight: Font.DemiBold
             }
 
-            Text {
+            IslandText {
                 text: "org.freedesktop.policykit.exec"
-                color: IslandTheme.fg2
-                font.family: IslandTheme.font
+                tone: "secondary"
                 font.pixelSize: 11
             }
         }
     }
 
-    Text {
+    IslandText {
         x: 15
         y: 148 - height / 2
         text: "Password"
-        color: IslandTheme.fg3
-        font.family: IslandTheme.font
+        tone: "muted"
         font.pixelSize: 11
     }
 
@@ -123,11 +91,9 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
 
-            Text {
+            IslandText {
                 anchors.verticalCenter: parent.verticalCenter
                 text: "••••••••••"
-                color: IslandTheme.fg
-                font.family: IslandTheme.font
                 font.pixelSize: 12
                 font.letterSpacing: 1
             }
@@ -141,18 +107,18 @@ Rectangle {
         }
     }
 
-    Button {
+    PillButton {
         x: 224
         y: 222
         width: 73
         label: "Cancel"
     }
 
-    Button {
+    PillButton {
         x: 305
         y: 222
         width: 111
         label: "Authenticate"
-        primary: true
+        emphasis: "primary"
     }
 }
