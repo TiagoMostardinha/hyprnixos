@@ -24,20 +24,11 @@ Rectangle {
         height: 16
     }
 
-    Rectangle {
+    LevelBar {
         x: 41
         anchors.verticalCenter: parent.verticalCenter
         width: 181
-        height: 6
-        radius: height / 2
-        color: IslandTheme.card2
-
-        Rectangle {
-            width: Math.max(parent.height, parent.width * card.level)
-            height: parent.height
-            radius: parent.radius
-            color: IslandTheme.fg
-        }
+        level: card.level
     }
 
     Text {
