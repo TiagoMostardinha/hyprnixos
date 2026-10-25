@@ -9,15 +9,7 @@ IslandCard {
 
     readonly property Notification notification: Notifications.latest
     readonly property bool active: area.containsMouse
-    // Picture sent with the notification first, then the app's icon; app icons stay in full colour.
-    readonly property string icon: {
-        if (!notification)
-            return "";
-        if (notification.image)
-            return notification.image;
-        const name = notification.appIcon || DesktopEntries.heuristicLookup(notification.desktopEntry || notification.appName)?.icon || "";
-        return name.startsWith("/") || name.includes("://") ? name : Quickshell.iconPath(name, true);
-    }
+    readonly property string icon: Notifications.icon(notification)
 
     signal dismissed
 
