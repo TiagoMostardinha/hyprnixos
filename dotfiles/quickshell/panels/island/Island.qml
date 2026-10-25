@@ -153,6 +153,22 @@ PanelWindow {
             root.card = "Idle";
             root.media = false;
         }
+        // With the media card open (and no keyboard-driven card in the middle), Space pauses or resumes
+        // and Alt + ← / → goes to the previous / next song.
+        Keys.onPressed: event => {
+            if (!root.media || ["Launcher", "Polkit", "Workspaces"].includes(root.card))
+                return;
+            const alt = event.modifiers & Qt.AltModifier;
+            if (event.key === Qt.Key_Space && !alt)
+                Media.player?.togglePlaying();
+            else if (event.key === Qt.Key_Left && alt && Media.player?.canGoPrevious)
+                Media.player.previous();
+            else if (event.key === Qt.Key_Right && alt && Media.player?.canGoNext)
+                Media.player.next();
+            else
+                return;
+            event.accepted = true;
+        }
 
         layer.enabled: true
         layer.effect: MultiEffect {

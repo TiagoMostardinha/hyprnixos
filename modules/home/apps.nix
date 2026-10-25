@@ -5,6 +5,7 @@
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
     pkgs.imv
+    pkgs.spotify
     pkgs.zed-editor
     pkgs.nil
     pkgs.nixd
