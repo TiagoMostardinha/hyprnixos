@@ -34,7 +34,7 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
     // Cards driven from the keyboard take it while open, so keys go straight to them.
-    WlrLayershell.keyboardFocus: ["Launcher", "Polkit", "Desktops"].includes(card) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
+    WlrLayershell.keyboardFocus: ["Launcher", "Polkit", "Workspaces"].includes(card) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
@@ -50,7 +50,7 @@ PanelWindow {
         osdTimer.restart();
     }
 
-    // Super + Space runs `qs ipc call island launcher`, Super + Tab `qs ipc call island desktops`.
+    // Super + Space runs `qs ipc call island launcher`, Super + Tab `qs ipc call island workspaces`.
     IpcHandler {
         target: "island"
 
@@ -58,8 +58,8 @@ PanelWindow {
             root.card = root.card === "Launcher" ? "Idle" : "Launcher";
         }
 
-        function desktops(): void {
-            root.card = root.card === "Desktops" ? "Idle" : "Desktops";
+        function workspaces(): void {
+            root.card = root.card === "Workspaces" ? "Idle" : "Workspaces";
         }
     }
 

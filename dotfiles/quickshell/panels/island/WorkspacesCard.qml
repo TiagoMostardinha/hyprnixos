@@ -4,7 +4,7 @@ import Quickshell.Hyprland
 IslandCard {
     id: card
 
-    // Desktops 1 to 5 in a circle (5 sits left of 1); the carousel starts on the focused one.
+    // Workspaces 1 to 5 in a circle (5 sits left of 1); the carousel starts on the focused one.
     readonly property int count: 5
     property int selected: {
         const id = Hyprland.focusedWorkspace?.id ?? 1;
@@ -38,7 +38,7 @@ IslandCard {
     IslandText {
         x: 16
         line: 24
-        text: "Desktops"
+        text: "Workspaces"
         font.pixelSize: IslandTheme.heading
         font.weight: Font.DemiBold
     }
@@ -58,7 +58,7 @@ IslandCard {
         height: 89
         clip: true
 
-        // One slot per desktop, created once when the card opens so each preview is captured a single
+        // One slot per workspace, created once when the card opens so each preview is captured a single
         // time; the arrows only move the slots around the circle.
         Repeater {
             model: card.count
