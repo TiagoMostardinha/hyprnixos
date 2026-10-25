@@ -6,11 +6,11 @@ Rectangle {
     radius: width / 2
     color: IslandTheme.pill
 
-    Rectangle {
+    MediaArt {
         anchors.centerIn: parent
         width: parent.width - 10
         height: width
         radius: 6
-        color: IslandTheme.card2
+        iconSize: 14
     }
 }

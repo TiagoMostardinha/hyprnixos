@@ -12,6 +12,17 @@ Singleton {
         ?? players[0]
         ?? null
 
+    // Spotify always sends the album cover; any other app (a browser playing YouTube, say) is shown by
+    // its own icon instead, in full colour.
+    readonly property bool usesCover: player?.dbusName.includes("spotify") ?? false
+    readonly property string cover: usesCover ? player.trackArtUrl : ""
+    readonly property string appIcon: {
+        if (!player)
+            return "";
+        const entry = DesktopEntries.byId(player.desktopEntry) ?? DesktopEntries.heuristicLookup(player.identity);
+        return Quickshell.iconPath(entry?.icon ?? player.desktopEntry, "audio-x-generic");
+    }
+
     readonly property real length: player?.lengthSupported ? player.length : 0
     readonly property real position: player?.positionSupported ? player.position : 0
     readonly property real progress: length > 0 ? Math.min(1, position / length) : 0
