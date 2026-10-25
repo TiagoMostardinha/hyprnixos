@@ -8,7 +8,7 @@ Rectangle {
     id: orb
 
     property real battery: 1.0
-    property string networkIcon: "network-wireless-signal-excellent-symbolic"
+    property string networkIcon: "network-offline-symbolic"
 
     readonly property real ring: width / 2 - 3.5
 

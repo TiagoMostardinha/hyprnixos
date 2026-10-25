@@ -1,4 +1,5 @@
 import QtQuick
+import "../../services"
 
 IslandCard {
     drop: 0
@@ -10,7 +11,7 @@ IslandCard {
 
     IslandText {
         anchors.centerIn: parent
-        text: "00:47"
+        text: Qt.formatTime(Time.date, "hh:mm")
         font.pixelSize: IslandTheme.large
         font.weight: Font.Medium
     }

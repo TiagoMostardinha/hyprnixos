@@ -2,14 +2,14 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Wayland
+import "../../services"
 
 PanelWindow {
     id: root
 
-    readonly property string card: "Idle"
+    property string card: "Idle"
 
     readonly property int orbSize: 28
-    readonly property real battery: 0.75
     readonly property int top: 8
     readonly property int shadowRoom: 16
 
@@ -19,16 +19,18 @@ PanelWindow {
     readonly property Item center: leftCard ? idleLoader.item : shown
     readonly property Item left: leftCard ? shown : leftOrb
 
-    readonly property real leftExtent: solo ? center.width / 2 : center ? center.width / 2 + (leftCard ? shown.gap : center.gap) + left.width : 0
-    readonly property real rightExtent: solo ? center.width / 2 : center ? center.width / 2 + center.gap + orbSize : 0
+    // The orbs sit just outside the centered card, so they spread as it grows.
+    readonly property real orbOffset: center ? center.width / 2 + center.gap : 0
 
     screen: Quickshell.screens.find(s => s.name === "eDP-1") ?? null
     anchors.top: true
+    anchors.left: true
+    anchors.right: true
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
+    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
 
-    implicitWidth: scene.width + 2 * shadowRoom
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
 
@@ -41,10 +43,12 @@ PanelWindow {
     Item {
         id: scene
 
-        x: root.shadowRoom
         y: root.top
-        width: Math.max(1, 2 * Math.max(root.leftExtent, root.rightExtent))
+        width: root.width
         height: Math.max(root.solo ? 1 : root.orbSize, root.center ? root.center.drop + root.center.height : 0, root.leftCard ? root.shown.drop + root.shown.height : 0)
+
+        focus: true
+        Keys.onEscapePressed: root.card = "Idle"
 
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -58,9 +62,15 @@ PanelWindow {
         Loader {
             id: cardLoader
 
-            x: root.leftCard ? scene.width / 2 - root.leftExtent : scene.width / 2 - (item ? item.width : 0) / 2
+            x: root.leftCard ? scene.width / 2 - root.center.width / 2 - (item?.gap ?? 0) - (item?.width ?? 0) : scene.width / 2 - (item?.width ?? 0) / 2
             y: item ? item.drop : 0
             source: root.card + "Card.qml"
+
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.card === "Idle"
+                onClicked: root.card = "Week"
+            }
         }
 
         Loader {
@@ -75,15 +85,26 @@ PanelWindow {
             id: leftOrb
 
             visible: !root.leftCard && !root.solo
-            x: scene.width / 2 - root.leftExtent
+            x: scene.width / 2 - root.orbOffset - width
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.card = "Media"
+            }
         }
 
         StatusOrb {
             id: rightOrb
 
             visible: !root.solo
-            x: scene.width / 2 + root.rightExtent - width
-            battery: root.battery
+            x: scene.width / 2 + root.orbOffset
+            battery: Battery.available ? Battery.percent / 100 : 1
+            networkIcon: Network.icon
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: root.card = "ControlCenter"
+            }
         }
     }
 }

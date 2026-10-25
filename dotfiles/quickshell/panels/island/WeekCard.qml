@@ -1,17 +1,14 @@
 import QtQuick
+import "../../services"
 
 IslandCard {
     id: card
 
-    readonly property var week: [
-        { label: "W", day: 9 },
-        { label: "T", day: 10 },
-        { label: "F", day: 11 },
-        { label: "SAT", day: 12 },
-        { label: "S", day: 13 },
-        { label: "M", day: 14 },
-        { label: "T", day: 15 }
-    ]
+    readonly property var week: [-3, -2, -1, 0, 1, 2, 3].map(offset => {
+        const date = new Date(Time.date.getFullYear(), Time.date.getMonth(), Time.date.getDate() + offset);
+        const name = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getDay()];
+        return { label: offset === 0 ? name : name[0], day: date.getDate() };
+    })
     readonly property int today: 3
 
     width: 210
@@ -20,7 +17,7 @@ IslandCard {
     IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         y: 10
-        text: "00:47"
+        text: Qt.formatTime(Time.date, "hh:mm")
         font.pixelSize: IslandTheme.display
         font.weight: Font.Medium
     }
