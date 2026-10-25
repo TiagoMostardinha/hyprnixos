@@ -36,6 +36,7 @@
   services.gnome.gcr-ssh-agent.enable = false;
 
   security.pam.services.quickshell = { };
+  security.pam.services.polkit-1.nodelay = true;
 
   programs.nm-applet.enable = true;
 }
