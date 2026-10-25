@@ -33,8 +33,8 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
-    // The launcher takes the keyboard so typing goes straight into its search.
-    WlrLayershell.keyboardFocus: card === "Launcher" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
+    // The launcher and the polkit prompt take the keyboard so typing goes straight into their field.
+    WlrLayershell.keyboardFocus: card === "Launcher" || card === "Polkit" ?WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
@@ -73,6 +73,15 @@ PanelWindow {
         onTriggered: root.armed = true
     }
 
+    // A polkit request opens its prompt; it closes once the request ends.
+    Connections {
+        target: Polkit
+
+        function onActiveChanged() {
+            root.card = Polkit.active ? "Polkit" : "Idle";
+        }
+    }
+
     Connections {
         target: Brightness
 
@@ -108,6 +117,8 @@ PanelWindow {
 
         focus: true
         Keys.onEscapePressed: {
+            if (Polkit.active)
+                Polkit.flow.cancelAuthenticationRequest();
             root.card = "Idle";
             root.media = false;
         }

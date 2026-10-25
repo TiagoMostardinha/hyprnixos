@@ -1,10 +1,20 @@
 import QtQuick
+import "../../services"
 
 IslandCard {
     id: card
 
     width: 400
     height: field.y + field.height + 12
+
+    function submit() {
+        if (!Polkit.flow?.isResponseRequired)
+            return;
+        Polkit.flow.submit(password.text);
+        password.text = "";
+    }
+
+    Component.onCompleted: password.forceActiveFocus()
 
     component LockBadge: Rectangle {
         width: 20
@@ -53,13 +63,13 @@ IslandCard {
 
             IslandText {
                 width: parent.width
-                text: "Authentication is needed to run `/usr/bin/true' as the super user"
+                text: Polkit.flow?.message ?? ""
                 wrapMode: Text.WordWrap
                 font.weight: Font.DemiBold
             }
 
             IslandText {
-                text: "org.freedesktop.policykit.exec"
+                text: Polkit.flow?.actionId ?? ""
                 tone: "secondary"
                 font.pixelSize: IslandTheme.small
             }
@@ -69,8 +79,9 @@ IslandCard {
     IslandText {
         x: 14
         line: message.y + message.height + 18
-        text: "Password"
-        tone: "muted"
+        // After a wrong password the label turns into a warning with the attempts left.
+        text: Polkit.failures > 0 ? `Wrong password, ${Polkit.attemptsLeft} ${Polkit.attemptsLeft === 1 ? "attempt" : "attempts"} left` : "Password"
+        tone: Polkit.failures > 0 ? "primary" : "muted"
         font.pixelSize: IslandTheme.small
     }
 
@@ -83,7 +94,7 @@ IslandCard {
         height: 28
         radius: IslandTheme.radiusButton
         color: IslandTheme.pill
-        border.color: IslandTheme.fg3
+        border.color: Polkit.failures > 0 ? IslandTheme.fg : IslandTheme.fg3
         border.width: 1
 
         LockGlyph {
@@ -92,23 +103,35 @@ IslandCard {
             color: IslandTheme.fg2
         }
 
-        Row {
+        IslandText {
+            visible: password.text === ""
             x: 26
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 2
+            text: "Enter your password"
+            tone: "muted"
+        }
 
-            IslandText {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "••••••••••"
-                font.letterSpacing: 1
-            }
+        TextInput {
+            id: password
 
-            Rectangle {
-                anchors.verticalCenter: parent.verticalCenter
+            x: 26
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width - x - 8
+            clip: true
+            color: IslandTheme.fg
+            font.family: IslandTheme.font
+            font.pixelSize: IslandTheme.body
+            font.letterSpacing: 1
+            echoMode: Polkit.flow?.responseVisible ? TextInput.Normal : TextInput.Password
+            passwordCharacter: "•"
+
+            cursorDelegate: Rectangle {
                 width: 1.5
-                height: 15
                 color: IslandTheme.fg
             }
+
+            Keys.onReturnPressed: card.submit()
+            Keys.onEnterPressed: card.submit()
         }
     }
 
@@ -121,5 +144,6 @@ IslandCard {
         height: field.height
         label: "Authenticate"
         emphasis: "primary"
+        onClicked: card.submit()
     }
 }

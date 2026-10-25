@@ -48,6 +48,7 @@
     btop
     curl
     git
+    kitty.terminfo
     vim
     wget
   ];

@@ -45,6 +45,4 @@ in
   };
 
   services.hypridle.enable = true;
-
-  services.hyprpolkitagent.enable = true;
 }

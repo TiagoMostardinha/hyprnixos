@@ -45,7 +45,7 @@ nixos-config/
 │   │   ├── bluetooth.nix, power.nix, thunar.nix, fonts.nix
 │   │   └── users.nix            # user account, shell, Home Manager wiring
 │   └── home/                    # shared Home Manager config; default.nix imports all
-│       ├── hyprland.nix         # links dotfiles/hypr/*, uwsm env, hyprpaper, polkit agent
+│       ├── hyprland.nix         # links dotfiles/hypr/*, uwsm env, hyprpaper
 │       ├── gtk.nix              # GTK icon theme (Colloid-Dark)
 │       ├── idle.nix             # hypridle unit + idle helper scripts
 │       ├── quickshell.nix       # pkgs.quickshell, links dotfiles/quickshell, user service
@@ -165,7 +165,7 @@ Hyprland 0.55, from the single stable nixpkgs channel, is installed by the NixOS
 - `environment.sessionVariables.NIXOS_OZONE_WL = "1";` so Electron/Chromium apps run natively on Wayland.
 - Use the nixpkgs Hyprland from the one stable channel; no second nixpkgs input. If the flake input is ever added: configure `hyprland.cachix.org` first, set both `programs.hyprland.package` and `portalPackage` from the flake, and make plugins follow the `hyprland` input.
 - If the Home Manager module `wayland.windowManager.hyprland` is ever used, set its `systemd.enable = false` (it conflicts with UWSM) and `package = null; portalPackage = null;` so the NixOS module's versions are used.
-- Ecosystem pieces, each optional: `hypridle` (idle/suspend), `hyprpolkitagent` (polkit prompts), `hyprpaper` (wallpaper). No `hyprlock`: the lock screen is Quickshell (`panels/lock/`, PAM service `quickshell`). Any lock screen needs a PAM service (`security.pam.services.<name> = {};`).
+- Ecosystem pieces, each optional: `hypridle` (idle/suspend), `hyprpaper` (wallpaper). No `hyprlock` or `hyprpolkitagent`: the lock screen is Quickshell (`panels/lock/`, PAM service `quickshell`) and polkit prompts come from Quickshell's built-in agent (`services/Polkit.qml`, shown by the island). Any lock screen needs a PAM service (`security.pam.services.<name> = {};`).
 
 **Config layout**
 

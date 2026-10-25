@@ -3,6 +3,7 @@
     enable = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+    shellAliases.sudo = "run0 --background=";
   };
 
   programs.fzf.enable = true;
