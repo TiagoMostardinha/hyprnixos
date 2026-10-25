@@ -9,16 +9,28 @@ Rectangle {
     property int labelWeight: Font.DemiBold
     property color labelColor: emphasis === "primary" ? IslandTheme.pill : emphasis === "quiet" ? IslandTheme.fg2 : IslandTheme.fg
 
+    // While held, the button inverts to white with a black label, like today's mark on the calendar.
+    readonly property bool pressed: area.pressed
+
+    signal clicked
+
     height: 28
     radius: IslandTheme.radiusButton
-    color: emphasis === "primary" ? IslandTheme.fg : emphasis === "quiet" ? IslandTheme.card : IslandTheme.card2
+    color: pressed ? IslandTheme.fg : emphasis === "primary" ? IslandTheme.fg : emphasis === "quiet" ? IslandTheme.card : IslandTheme.card2
 
     IslandText {
         visible: text !== ""
         anchors.centerIn: parent
         text: button.label
-        color: button.labelColor
+        color: button.pressed ? IslandTheme.pill : button.labelColor
         font.pixelSize: button.labelSize
         font.weight: button.labelWeight
+    }
+
+    MouseArea {
+        id: area
+
+        anchors.fill: parent
+        onClicked: button.clicked()
     }
 }

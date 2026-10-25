@@ -1,12 +1,20 @@
 import QtQuick
+import "../../services"
 
 IslandCard {
     id: card
 
-    readonly property int month: 8
-    readonly property int today: 12
-    readonly property var events: [17]
-    readonly property date first: new Date(2026, 7, 30)
+    // Months away from the current one; the arrows step it.
+    property int shift: 0
+    readonly property date shown: new Date(Time.date.getFullYear(), Time.date.getMonth() + shift, 1)
+    readonly property int year: shown.getFullYear()
+    readonly property int month: shown.getMonth()
+    readonly property int today: shift === 0 ? Time.date.getDate() : 0
+    readonly property var events: []
+    // The grid starts on the Sunday on or before the 1st and always shows six weeks, enough for any month.
+    readonly property int lead: new Date(year, month, 1).getDay()
+    readonly property date first: new Date(year, month, 1 - lead)
+    readonly property int rows: 6
 
     readonly property int columnStart: 32
     readonly property int columnStep: 38
@@ -14,12 +22,12 @@ IslandCard {
     readonly property int rowStep: 26
 
     width: 292
-    height: 202
+    height: rowStart + (rows - 1) * rowStep + 24
 
     Repeater {
         model: [
-            { x: 26, glyph: "←" },
-            { x: card.width - 26, glyph: "→" }
+            { x: 26, glyph: "←", step: -1 },
+            { x: card.width - 26, glyph: "→", step: 1 }
         ]
 
         PillButton {
@@ -34,13 +42,14 @@ IslandCard {
             label: modelData.glyph
             labelColor: IslandTheme.fg
             labelWeight: Font.Normal
+            onClicked: card.shift += modelData.step
         }
     }
 
     IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         y: 24 - height / 2
-        text: "September 2026"
+        text: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][card.month] + " " + card.year
         font.pixelSize: IslandTheme.title
         font.weight: Font.DemiBold
     }
@@ -61,7 +70,7 @@ IslandCard {
     }
 
     Repeater {
-        model: 35
+        model: card.rows * 7
 
         Item {
             id: cell
@@ -79,10 +88,13 @@ IslandCard {
             height: 22
 
             Rectangle {
-                visible: cell.isToday
-                anchors.fill: parent
-                radius: width / 2
-                color: IslandTheme.fg
+                visible: cell.isToday || hover.containsMouse
+                anchors.centerIn: parent
+                width: 22
+                height: 24
+                radius: IslandTheme.radiusSmall
+                opacity: cell.isToday ? 1 : 0.6
+                color: cell.isToday ? IslandTheme.fg : IslandTheme.card
             }
 
             IslandText {
@@ -100,6 +112,13 @@ IslandCard {
                 height: 3
                 radius: 1.5
                 color: IslandTheme.fg2
+            }
+
+            MouseArea {
+                id: hover
+
+                anchors.fill: parent
+                hoverEnabled: true
             }
         }
     }
