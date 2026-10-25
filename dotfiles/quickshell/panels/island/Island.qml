@@ -209,7 +209,7 @@ PanelWindow {
             active: root.osd !== ""
             x: scene.width / 2 - (item?.width ?? 0) / 2
             y: item ? item.drop : 0
-            source: root.osd + "Card.qml"
+            source: root.osd ? root.osd + "Card.qml" : ""
         }
 
         Loader {

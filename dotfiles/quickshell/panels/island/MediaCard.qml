@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Widgets
 import "../../services"
 
@@ -6,6 +7,15 @@ IslandCard {
     id: card
 
     readonly property var player: Media.player
+    // Spotify always sends the album cover; any other app (a browser playing YouTube, say) shows its
+    // own icon instead, in full colour.
+    readonly property bool cover: (player?.dbusName.includes("spotify") ?? false) && player.trackArtUrl !== ""
+    readonly property string appIcon: {
+        if (!player)
+            return "";
+        const entry = DesktopEntries.byId(player.desktopEntry) ?? DesktopEntries.heuristicLookup(player.identity);
+        return Quickshell.iconPath(entry?.icon ?? player.desktopEntry, "audio-x-generic");
+    }
 
     gap: 10
 
@@ -21,11 +31,19 @@ IslandCard {
         color: IslandTheme.card2
 
         Image {
+            visible: card.cover
             anchors.fill: parent
-            source: card.player?.trackArtUrl ?? ""
+            source: card.cover ? card.player.trackArtUrl : ""
             sourceSize: Qt.size(width * 2, height * 2)
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
+        }
+
+        IconImage {
+            visible: !card.cover && card.player !== null
+            anchors.centerIn: parent
+            implicitSize: 44
+            source: card.appIcon
         }
     }
 
