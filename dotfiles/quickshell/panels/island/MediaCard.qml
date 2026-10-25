@@ -3,7 +3,6 @@ import QtQuick
 IslandCard {
     id: card
 
-    side: "left"
     gap: 10
 
     width: 340

@@ -8,16 +8,16 @@ PanelWindow {
     id: root
 
     property string card: "Idle"
+    // The media card replaces the left orb next to whatever card is in the middle.
+    property bool media: false
 
     readonly property int orbSize: 28
     readonly property int top: 8
     readonly property int shadowRoom: 16
 
-    readonly property Item shown: cardLoader.item
-    readonly property bool leftCard: shown?.side === "left"
-    readonly property bool solo: shown?.side === "solo"
-    readonly property Item center: leftCard ? idleLoader.item : shown
-    readonly property Item left: leftCard ? shown : leftOrb
+    readonly property Item center: cardLoader.item
+    readonly property bool solo: center?.side === "solo"
+    readonly property Item left: media ? mediaLoader.item : leftOrb
 
     // The orbs sit just outside the centered card, so they spread as it grows.
     readonly property real orbOffset: center ? center.width / 2 + center.gap : 0
@@ -34,6 +34,10 @@ PanelWindow {
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
 
+    // Solo cards cover the whole island, so they close the media card.
+    onSoloChanged: if (solo)
+        media = false
+
     mask: Region {
         Region { item: root.solo ? null : root.left }
         Region { item: root.center }
@@ -45,10 +49,13 @@ PanelWindow {
 
         y: root.top
         width: root.width
-        height: Math.max(root.solo ? 1 : root.orbSize, root.center ? root.center.drop + root.center.height : 0, root.leftCard ? root.shown.drop + root.shown.height : 0)
+        height: Math.max(root.solo ? 1 : root.orbSize, root.center ? root.center.drop + root.center.height : 0, root.media && root.left ? root.left.drop + root.left.height : 0)
 
         focus: true
-        Keys.onEscapePressed: root.card = "Idle"
+        Keys.onEscapePressed: {
+            root.card = "Idle";
+            root.media = false;
+        }
 
         layer.enabled: true
         layer.effect: MultiEffect {
@@ -62,7 +69,7 @@ PanelWindow {
         Loader {
             id: cardLoader
 
-            x: root.leftCard ? scene.width / 2 - root.center.width / 2 - (item?.gap ?? 0) - (item?.width ?? 0) : scene.width / 2 - (item?.width ?? 0) / 2
+            x: scene.width / 2 - (item?.width ?? 0) / 2
             y: item ? item.drop : 0
             source: root.card + "Card.qml"
 
@@ -83,22 +90,23 @@ PanelWindow {
         }
 
         Loader {
-            id: idleLoader
+            id: mediaLoader
 
-            active: root.leftCard
-            x: scene.width / 2 - width / 2
-            source: "IdleCard.qml"
+            active: root.media
+            x: scene.width / 2 - (root.center?.width ?? 0) / 2 - (item?.gap ?? 0) - (item?.width ?? 0)
+            y: item ? item.drop : 0
+            source: "MediaCard.qml"
         }
 
         CoverOrb {
             id: leftOrb
 
-            visible: !root.leftCard && !root.solo
+            visible: !root.media && !root.solo
             x: scene.width / 2 - root.orbOffset - width
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.card = "Media"
+                onClicked: root.media = true
             }
         }
 
