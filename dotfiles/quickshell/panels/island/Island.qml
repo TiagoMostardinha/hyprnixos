@@ -10,13 +10,16 @@ PanelWindow {
     property string card: "Idle"
     // The media card replaces the left orb next to whatever card is in the middle.
     property bool media: false
+    // Brightness or Volume, shown briefly over the middle card when the level changes.
+    property string osd: ""
+    property bool armed: false
 
     readonly property int orbSize: 28
     readonly property int top: 8
     readonly property int shadowRoom: 16
 
-    readonly property Item center: cardLoader.item
-    readonly property bool solo: center?.side === "solo"
+    readonly property Item center: osd ? osdLoader.item : cardLoader.item
+    readonly property bool solo: cardLoader.item?.side === "solo"
     readonly property Item left: media ? mediaLoader.item : leftOrb
 
     // The orbs sit just outside the centered card, so they spread as it grows.
@@ -37,6 +40,46 @@ PanelWindow {
     // Solo cards cover the whole island, so they close the media card.
     onSoloChanged: if (solo)
         media = false
+
+    function flash(name) {
+        if (!armed || solo)
+            return;
+        osd = name;
+        osdTimer.restart();
+    }
+
+    Timer {
+        id: osdTimer
+        interval: 1500
+        onTriggered: root.osd = ""
+    }
+
+    // Levels settle as the services connect at startup; only react to changes after that.
+    Timer {
+        running: true
+        interval: 1000
+        onTriggered: root.armed = true
+    }
+
+    Connections {
+        target: Brightness
+
+        function onLevelChanged() {
+            root.flash("Brightness");
+        }
+    }
+
+    Connections {
+        target: Audio
+
+        function onVolumeChanged() {
+            root.flash("Volume");
+        }
+
+        function onMutedChanged() {
+            root.flash("Volume");
+        }
+    }
 
     mask: Region {
         Region { item: root.solo ? null : root.left }
@@ -69,6 +112,7 @@ PanelWindow {
         Loader {
             id: cardLoader
 
+            visible: !root.osd
             x: scene.width / 2 - (item?.width ?? 0) / 2
             y: item ? item.drop : 0
             source: root.card + "Card.qml"
@@ -87,6 +131,15 @@ PanelWindow {
                     root.card = card;
                 }
             }
+        }
+
+        Loader {
+            id: osdLoader
+
+            active: root.osd !== ""
+            x: scene.width / 2 - (item?.width ?? 0) / 2
+            y: item ? item.drop : 0
+            source: root.osd + "Card.qml"
         }
 
         Loader {

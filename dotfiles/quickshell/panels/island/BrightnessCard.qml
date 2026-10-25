@@ -1,7 +1,8 @@
 import QtQuick
+import "../../services"
 
 OsdCard {
-    level: 0.17
+    level: Brightness.level
 
     SunGlyph {}
 }

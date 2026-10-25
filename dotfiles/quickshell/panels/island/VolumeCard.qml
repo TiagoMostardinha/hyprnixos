@@ -1,7 +1,8 @@
 import QtQuick
+import "../../services"
 
 OsdCard {
-    level: 0.48
+    level: Audio.muted ? 0 : Math.min(Audio.volume, 1)
 
     SpeakerGlyph {}
 }
