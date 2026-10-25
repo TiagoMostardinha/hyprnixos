@@ -14,6 +14,15 @@ IslandCard {
     width: 210
     height: 84
 
+    Rectangle {
+        visible: hover.containsMouse
+        anchors.fill: parent
+        anchors.margins: 8
+        radius: card.radius - anchors.margins
+        opacity: 0.6
+        color: IslandTheme.card
+    }
+
     IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         y: 10
@@ -28,7 +37,7 @@ IslandCard {
         width: 28
         height: 34
         radius: IslandTheme.radiusSmall
-        color: IslandTheme.card
+        color: hover.containsMouse ? IslandTheme.card2 : IslandTheme.card
     }
 
     Row {
@@ -67,5 +76,13 @@ IslandCard {
                 }
             }
         }
+    }
+
+    MouseArea {
+        id: hover
+
+        anchors.fill: parent
+        hoverEnabled: true
+        onClicked: card.open("Calendar")
     }
 }

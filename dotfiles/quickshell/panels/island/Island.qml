@@ -71,6 +71,15 @@ PanelWindow {
                 enabled: root.card === "Idle"
                 onClicked: root.card = "Week"
             }
+
+            Connections {
+                target: cardLoader.item
+                ignoreUnknownSignals: true
+
+                function onOpen(card) {
+                    root.card = card;
+                }
+            }
         }
 
         Loader {
