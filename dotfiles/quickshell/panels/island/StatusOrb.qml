@@ -1,8 +1,5 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Shapes
-import Quickshell
-import Quickshell.Widgets
 
 Rectangle {
     id: orb
@@ -38,25 +35,9 @@ Rectangle {
         }
     }
 
-    IconImage {
-        id: icon
-
+    SymbolicIcon {
         anchors.centerIn: parent
-        implicitSize: 12
-        source: Quickshell.iconPath(orb.networkIcon)
-        visible: false
-        layer.enabled: true
-    }
-
-    Rectangle {
-        anchors.fill: icon
-        color: IslandTheme.fg
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            maskEnabled: true
-            maskSource: icon
-            maskThresholdMin: 0.5
-            maskSpreadAtMin: 1.0
-        }
+        name: orb.networkIcon
+        size: 12
     }
 }

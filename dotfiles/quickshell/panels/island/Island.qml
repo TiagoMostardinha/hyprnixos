@@ -131,6 +131,9 @@ PanelWindow {
 
         function onArrived(notification) {
             const critical = notification.urgency === NotificationUrgency.Critical;
+            // Do not disturb holds back everything but critical notifications.
+            if (Notifications.dnd && !critical)
+                return;
             const timeout = notification.expireTimeout > 0 ? notification.expireTimeout : 5000;
             root.flash("Notification", critical ? 0 : timeout);
         }

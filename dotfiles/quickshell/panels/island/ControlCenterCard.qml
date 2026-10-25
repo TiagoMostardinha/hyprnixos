@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell.Services.UPower
 import Quickshell.Widgets
 import "../../services"
 
@@ -12,12 +13,22 @@ IslandCard {
     readonly property int pad: 12
     readonly property int inner: media.width
 
+    // Placeholder toggles for now; slots 1 and 2 hold the DND and power-profile buttons below.
     readonly property var toggles: [
-        { label: "Wi-Fi", on: true },
-        { label: "DND", on: false },
-        { label: "profile", on: false },
-        { label: "BT", on: true }
+        { label: "Wi-Fi", on: true, slot: 0 },
+        { label: "BT", on: true, slot: 3 }
     ]
+
+    // Power profile, cycled eco -> normal -> performance (skipped if the machine has none).
+    readonly property var profiles: PowerProfiles.hasPerformanceProfile
+        ? [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
+        : [PowerProfile.PowerSaver, PowerProfile.Balanced]
+    // Each profile's Colloid icon: a leaf (eco), "=" (balanced), a bolt (performance).
+    readonly property string profileIcon: ({
+        [PowerProfile.PowerSaver]: "emoji-nature-symbolic",
+        [PowerProfile.Balanced]: "image-equalize-symbolic",
+        [PowerProfile.Performance]: "preferences-system-power-symbolic"
+    })[PowerProfiles.profile] ?? ""
 
     width: inner + 2 * pad
     height: notifications.y + notifications.height + pad
@@ -49,12 +60,49 @@ IslandCard {
             required property var modelData
             required property int index
 
-            x: card.pad + index * (width + 6)
+            x: card.pad + modelData.slot * (width + 6)
             y: media.y + media.height + 8
             width: (card.inner - 3 * 6) / 4
             emphasis: modelData.on ? "secondary" : "quiet"
             label: modelData.label
             labelSize: IslandTheme.small
+        }
+    }
+
+    // Do not disturb: a bell while notifications pop up, a crossed-out bell while they're held back.
+    PillButton {
+        id: dnd
+
+        x: card.pad + 1 * (width + 6)
+        y: media.y + media.height + 8
+        width: (card.inner - 3 * 6) / 4
+        emphasis: Notifications.dnd ? "quiet" : "secondary"
+        onClicked: Notifications.dnd = !Notifications.dnd
+
+        SymbolicIcon {
+            anchors.centerIn: parent
+            name: Notifications.dnd ? "notifications-disabled-symbolic" : "notifications-symbolic"
+            size: 14
+            color: dnd.inverted ? IslandTheme.pill : Notifications.dnd ? IslandTheme.fg2 : IslandTheme.fg
+        }
+    }
+
+    PillButton {
+        id: profile
+
+        x: card.pad + 2 * (width + 6)
+        y: media.y + media.height + 8
+        width: (card.inner - 3 * 6) / 4
+        onClicked: {
+            const next = (card.profiles.indexOf(PowerProfiles.profile) + 1) % card.profiles.length;
+            PowerProfiles.profile = card.profiles[next];
+        }
+
+        SymbolicIcon {
+            anchors.centerIn: parent
+            name: card.profileIcon
+            size: 14
+            color: profile.inverted ? IslandTheme.pill : IslandTheme.fg
         }
     }
 

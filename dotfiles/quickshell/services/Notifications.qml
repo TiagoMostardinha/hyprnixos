@@ -9,6 +9,8 @@ Singleton {
     id: root
 
     property Notification latest: null
+    // Do not disturb: notifications are still received and listed, but don't pop up on the island.
+    property bool dnd: false
     readonly property var all: server.trackedNotifications.values
     // Newest first, for lists.
     readonly property var history: all.slice().reverse()
