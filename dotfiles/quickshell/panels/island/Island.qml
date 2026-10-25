@@ -33,8 +33,8 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
-    // The launcher and the polkit prompt take the keyboard so typing goes straight into their field.
-    WlrLayershell.keyboardFocus: card === "Launcher" || card === "Polkit" ?WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
+    // Cards driven from the keyboard take it while open, so keys go straight to them.
+    WlrLayershell.keyboardFocus: ["Launcher", "Polkit", "Desktops"].includes(card) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
@@ -50,12 +50,16 @@ PanelWindow {
         osdTimer.restart();
     }
 
-    // Super + Space runs `qs ipc call island launcher`.
+    // Super + Space runs `qs ipc call island launcher`, Super + Tab `qs ipc call island desktops`.
     IpcHandler {
         target: "island"
 
         function launcher(): void {
             root.card = root.card === "Launcher" ? "Idle" : "Launcher";
+        }
+
+        function desktops(): void {
+            root.card = root.card === "Desktops" ? "Idle" : "Desktops";
         }
     }
 

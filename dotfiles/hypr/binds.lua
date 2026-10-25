@@ -10,6 +10,7 @@ hl.bind(mod .. " + E",     hl.dsp.exec_cmd(fileManager))
 hl.bind(mod .. " + V",     hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mod .. " + F",     hl.dsp.window.fullscreen())
 hl.bind(mod .. " + SPACE", hl.dsp.exec_cmd(menu))
+hl.bind(mod .. " + TAB",   hl.dsp.exec_cmd("qs ipc call island desktops"))
 hl.bind(mod .. " + L",     hl.dsp.exec_cmd("loginctl lock-session"))
 hl.bind(mod .. " + P",     hl.dsp.window.pseudo())
 hl.bind(mod .. " + J",     hl.dsp.layout("togglesplit"))
@@ -22,10 +23,9 @@ hl.bind(mod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
-for i = 1, 10 do
-    local key = i % 10
-    hl.bind(mod .. " + " .. key,         hl.dsp.focus({ workspace = i }))
-    hl.bind(mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+for i = 1, 5 do
+    hl.bind(mod .. " + " .. i,         hl.dsp.focus({ workspace = i }))
+    hl.bind(mod .. " + SHIFT + " .. i, hl.dsp.window.move({ workspace = i }))
 end
 
 hl.bind(mod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
