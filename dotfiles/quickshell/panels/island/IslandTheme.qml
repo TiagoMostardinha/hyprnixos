@@ -11,6 +11,8 @@ Singleton {
     readonly property color fg: "#ffffff"
     readonly property color fg2: "#9a9a9a"
     readonly property color fg3: "#5a5a5a"
+    // The one colour so far: a status that is on (e.g. Tailscale connected).
+    readonly property color online: "#34c759"
     readonly property string font: "Inter"
 
     readonly property int tiny: 9

@@ -1,4 +1,8 @@
 import QtQuick
+import Quickshell
+import Quickshell.Io
+import Quickshell.Widgets
+import "../../services"
 
 IslandCard {
     id: card
@@ -7,32 +11,150 @@ IslandCard {
     drop: 0
     gap: 0
 
-    readonly property real battery: 0.72
+    readonly property real battery: Battery.available ? Battery.percent / 100 : 1
+
+    // Main route: the interface and address used to reach the internet, refreshed while open.
+    property string device: ""
+    property string address: ""
+    property bool tailscale: false
+    property real received: 0
+    property real sent: 0
+
+    function size(bytes) {
+        return bytes >= 1e9 ? (bytes / 1e9).toFixed(1) + " GB" : Math.round(bytes / 1e6) + " MB";
+    }
+
+    function refresh() {
+        route.running = true;
+        rx.reload();
+        tx.reload();
+        links.running = true;
+    }
+
+    Component.onCompleted: refresh()
+
+    Timer {
+        running: true
+        repeat: true
+        interval: 2000
+        onTriggered: card.refresh()
+    }
+
+    Process {
+        id: route
+
+        command: ["ip", "-j", "route", "get", "1.1.1.1"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const info = JSON.parse(text || "[]")[0] ?? {};
+                card.device = info.dev ?? "";
+                card.address = info.prefsrc ?? "";
+            }
+        }
+    }
+
+    FileView {
+        id: rx
+        path: card.device ? `/sys/class/net/${card.device}/statistics/rx_bytes` : ""
+        onLoaded: card.received = parseFloat(text())
+    }
+
+    FileView {
+        id: tx
+        path: card.device ? `/sys/class/net/${card.device}/statistics/tx_bytes` : ""
+        onLoaded: card.sent = parseFloat(text())
+    }
+
+    // Tailscale is on while its backend is "Running" (the tailscale0 interface stays even when off).
+    Process {
+        id: links
+
+        command: ["tailscale", "status", "--json"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    card.tailscale = JSON.parse(text).BackendState === "Running";
+                } catch (error) {
+                    card.tailscale = false;
+                }
+            }
+        }
+    }
+
+    // Clicking the tailscale pill turns it on or off (allowed for the operator user set in core.nix).
+    Process {
+        id: toggle
+
+        command: ["tailscale", card.tailscale ? "down" : "up"]
+        onExited: links.running = true
+    }
+
+    // Runs a session action and closes the card.
+    function run(command) {
+        Quickshell.execDetached(command);
+        card.open("Idle");
+    }
 
     width: 420
     height: 146
 
+    // Bottom buttons: invert on hover. Risky ones (reboot, power off) arm on the first click, staying
+    // inverted, and only act on a second click within 3 seconds.
     component IconBox: Rectangle {
+        id: box
+
+        property bool confirm: false
+        property bool armed: false
+        readonly property bool inverted: armed || boxArea.containsMouse
+
+        signal activated
+
         y: 110
         width: 22
         height: 22
         radius: IslandTheme.radiusSmall
-        color: IslandTheme.card2
+        color: inverted ? IslandTheme.fg : IslandTheme.card2
+
+        Timer {
+            running: box.armed
+            interval: 3000
+            onTriggered: box.armed = false
+        }
+
+        MouseArea {
+            id: boxArea
+
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: {
+                if (box.confirm && !box.armed)
+                    box.armed = true;
+                else
+                    box.activated();
+            }
+        }
     }
 
     component BoxGlyph: PathGlyph {
         anchors.centerIn: parent
-        color: IslandTheme.fg2
+        color: parent.inverted ? IslandTheme.pill : IslandTheme.fg2
         strokeWidth: 1.4
     }
 
-    Rectangle {
+    ClippingRectangle {
         x: 12
         y: 12
         width: 40
         height: 40
         radius: 20
         color: IslandTheme.card2
+
+        Image {
+            anchors.fill: parent
+            source: User.avatar
+            sourceSize: Qt.size(width * 2, height * 2)
+            fillMode: Image.PreserveAspectCrop
+        }
     }
 
     Row {
@@ -43,14 +165,14 @@ IslandCard {
         IslandText {
             id: user
 
-            text: "tiago"
+            text: User.name
             font.pixelSize: IslandTheme.heading
             font.weight: Font.DemiBold
         }
 
         IslandText {
             anchors.baseline: user.baseline
-            text: "(latitude-7340)"
+            text: "(" + System.hostname + ")"
             tone: "secondary"
             font.pixelSize: IslandTheme.small
         }
@@ -59,7 +181,7 @@ IslandCard {
     IslandText {
         x: 62
         line: 44
-        text: "up 2 hours, 23 minutes"
+        text: System.uptimeText
         tone: "muted"
         font.pixelSize: IslandTheme.small
     }
@@ -84,38 +206,41 @@ IslandCard {
         }
     }
 
+    // Green while there is a route to the internet, grey when offline.
     Rectangle {
         x: 14
         y: 66
         width: 10
         height: 10
         radius: 3
-        color: IslandTheme.fg
+        color: card.address ? IslandTheme.online : IslandTheme.fg3
     }
 
     IslandText {
         x: 30
         line: 75
-        text: "192.168.1.30"
+        text: card.address || "offline"
         font.pixelSize: IslandTheme.title
         font.weight: Font.DemiBold
     }
 
     IslandText {
+        id: deviceLabel
+
         x: 14
         line: 93
-        text: "eth0"
+        text: card.device || "—"
         tone: "secondary"
         font.pixelSize: IslandTheme.small
     }
 
     Rectangle {
-        x: 44
+        x: deviceLabel.x + deviceLabel.width + 8
         y: 83
         width: 56
         height: 14
         radius: 7
-        color: IslandTheme.card2
+        color: pillArea.containsMouse ? IslandTheme.line : IslandTheme.card2
 
         Rectangle {
             x: 8 - width / 2
@@ -123,7 +248,16 @@ IslandCard {
             width: 6
             height: 6
             radius: 3
-            color: IslandTheme.fg
+            color: card.tailscale ? IslandTheme.online : IslandTheme.fg3
+        }
+
+        MouseArea {
+            id: pillArea
+
+            anchors.fill: parent
+            hoverEnabled: true
+            enabled: !toggle.running
+            onClicked: toggle.running = true
         }
 
         IslandText {
@@ -138,13 +272,13 @@ IslandCard {
     IslandText {
         x: card.width - 14 - width
         line: 75
-        text: "↓ 407 MB"
+        text: "↓ " + card.size(card.received)
     }
 
     IslandText {
         x: card.width - 14 - width
         line: 93
-        text: "↑ 46 MB"
+        text: "↑ " + card.size(card.sent)
         tone: "secondary"
     }
 
@@ -159,15 +293,17 @@ IslandCard {
 
     IconBox {
         x: 14
+        onActivated: card.run(["loginctl", "lock-session"])
 
         LockGlyph {
             anchors.centerIn: parent
-            color: IslandTheme.fg2
+            color: parent.inverted ? IslandTheme.pill : IslandTheme.fg2
         }
     }
 
     IconBox {
         x: 40
+        onActivated: card.run(["systemctl", "suspend"])
 
         BoxGlyph {
             fill: "M 7.162 3.058 A 6 6 0 1 0 13.164 12.056 A 5.5 5.5 0 0 1 7.162 3.058 Z"
@@ -177,13 +313,15 @@ IslandCard {
     IslandText {
         anchors.horizontalCenter: parent.horizontalCenter
         line: 125
-        text: "01:51  Sat, 24 Oct 2026"
+        text: Qt.formatTime(Time.date, "hh:mm") + "  " + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][Time.date.getDay()] + ", " + Time.date.getDate() + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Time.date.getMonth()] + " " + Time.date.getFullYear()
         tone: "secondary"
         font.pixelSize: IslandTheme.small
     }
 
     IconBox {
         x: card.width - 62
+        confirm: true
+        onActivated: card.run(["systemctl", "reboot"])
 
         BoxGlyph {
             stroke: "M 13 9 A 5 5 0 1 1 10 4.5 M 9 1.5 L 12 4.5 L 8 6.5"
@@ -192,6 +330,8 @@ IslandCard {
 
     IconBox {
         x: card.width - 36
+        confirm: true
+        onActivated: card.run(["systemctl", "poweroff"])
 
         BoxGlyph {
             stroke: "M 11.5 5 A 5.5 5.5 0 1 1 4.5 5 M 8 2 V 8"

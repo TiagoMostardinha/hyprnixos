@@ -38,6 +38,8 @@ in
     swappy
     wf-recorder
     wl-clipboard
+    wlrctl
+    wtype
   ];
 
   services.hyprpaper = {

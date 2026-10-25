@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Notifications
 import Quickshell.Wayland
@@ -57,7 +58,8 @@ PanelWindow {
             osdTimer.stop();
     }
 
-    // Super + Space runs `qs ipc call island launcher`, Super + Tab `qs ipc call island workspaces`.
+    // Super + Space runs `qs ipc call island launcher`, Super + Tab `qs ipc call island workspaces`,
+    // Super + M `qs ipc call island gateway`.
     IpcHandler {
         target: "island"
 
@@ -67,6 +69,10 @@ PanelWindow {
 
         function workspaces(): void {
             root.card = root.card === "Workspaces" ? "Idle" : "Workspaces";
+        }
+
+        function gateway(): void {
+            root.card = root.card === "Gateway" ? "Idle" : "Gateway";
         }
     }
 
@@ -81,6 +87,13 @@ PanelWindow {
         running: true
         interval: 1000
         onTriggered: root.armed = true
+    }
+
+    // The gateway card takes the keyboard (for Escape) and closes when you click anywhere else.
+    HyprlandFocusGrab {
+        windows: [root]
+        active: root.card === "Gateway"
+        onCleared: root.card = "Idle"
     }
 
     // A polkit request opens its prompt; it closes once the request ends.

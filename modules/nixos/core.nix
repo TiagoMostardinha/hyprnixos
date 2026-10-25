@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, username, ... }:
 
 {
   nix.settings = {
@@ -43,11 +43,16 @@
   services.xserver.xkb.layout = "pt";
 
   services.fwupd.enable = true;
+  services.tailscale = {
+    enable = true;
+    extraSetFlags = [ "--operator=${username}" ];
+  };
 
   environment.systemPackages = with pkgs; [
     btop
     curl
     git
+    jq
     kitty.terminfo
     vim
     wget

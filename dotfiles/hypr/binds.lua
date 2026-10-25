@@ -5,7 +5,8 @@ local menu        = "qs ipc call island launcher"
 
 hl.bind(mod .. " + Q",     hl.dsp.exec_cmd(terminal))
 hl.bind(mod .. " + C",     hl.dsp.window.close())
-hl.bind(mod .. " + M",     hl.dsp.exec_cmd("uwsm stop"))
+hl.bind(mod .. " + SHIFT + M", hl.dsp.exec_cmd("uwsm stop"))
+hl.bind(mod .. " + M",     hl.dsp.exec_cmd("qs ipc call island gateway"))
 hl.bind(mod .. " + E",     hl.dsp.exec_cmd(fileManager))
 hl.bind(mod .. " + V",     hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mod .. " + F",     hl.dsp.window.fullscreen())
