@@ -17,11 +17,26 @@ IslandCard {
     property string device: ""
     property string address: ""
     property bool tailscale: false
-    property real received: 0
-    property real sent: 0
+    // Download / upload speed: change in the interface's byte counters between readings, per second.
+    property real downRate: 0
+    property real upRate: 0
+    property var samples: ({})
 
-    function size(bytes) {
-        return bytes >= 1e9 ? (bytes / 1e9).toFixed(1) + " GB" : Math.round(bytes / 1e6) + " MB";
+    function sample(key, bytes) {
+        const now = Date.now();
+        const last = samples[key];
+        samples[key] = { bytes, now };
+        if (!last || now <= last.now || bytes < last.bytes)
+            return 0;
+        return (bytes - last.bytes) / ((now - last.now) / 1000);
+    }
+
+    function speed(rate) {
+        if (rate >= 1e6)
+            return (rate / 1e6).toFixed(1) + " MB/s";
+        if (rate >= 1e3)
+            return Math.round(rate / 1e3) + " KB/s";
+        return Math.round(rate) + " B/s";
     }
 
     function refresh() {
@@ -56,13 +71,13 @@ IslandCard {
     FileView {
         id: rx
         path: card.device ? `/sys/class/net/${card.device}/statistics/rx_bytes` : ""
-        onLoaded: card.received = parseFloat(text())
+        onLoaded: card.downRate = card.sample("rx", parseFloat(text()))
     }
 
     FileView {
         id: tx
         path: card.device ? `/sys/class/net/${card.device}/statistics/tx_bytes` : ""
-        onLoaded: card.sent = parseFloat(text())
+        onLoaded: card.upRate = card.sample("tx", parseFloat(text()))
     }
 
     // Tailscale is on while its backend is "Running" (the tailscale0 interface stays even when off).
@@ -269,17 +284,45 @@ IslandCard {
         }
     }
 
+    // Arrows sit at a fixed spot with room for the widest speed ("999 KB/s"); only the numbers,
+    // right-aligned in equal-width digits, change.
+    readonly property real speedWidth: widest.width
+
+    TextMetrics {
+        id: widest
+
+        text: "999 KB/s"
+        font.family: IslandTheme.font
+        font.pixelSize: IslandTheme.body
+        font.features: { "tnum": 1 }
+    }
+
+    IslandText {
+        x: card.width - 14 - card.speedWidth - 4 - width
+        line: 75
+        text: "↓"
+    }
+
     IslandText {
         x: card.width - 14 - width
         line: 75
-        text: "↓ " + card.size(card.received)
+        text: card.speed(card.downRate)
+        font.features: { "tnum": 1 }
+    }
+
+    IslandText {
+        x: card.width - 14 - card.speedWidth - 4 - width
+        line: 93
+        text: "↑"
+        tone: "secondary"
     }
 
     IslandText {
         x: card.width - 14 - width
         line: 93
-        text: "↑ " + card.size(card.sent)
+        text: card.speed(card.upRate)
         tone: "secondary"
+        font.features: { "tnum": 1 }
     }
 
     Rectangle {
