@@ -13,11 +13,12 @@ IslandCard {
     readonly property int pad: 12
     readonly property int inner: media.width
 
-    // Placeholder toggles for now; slots 1 and 2 hold the DND and power-profile buttons below.
+    // Placeholder toggle for now; slots 0–2 hold the Wi-Fi, DND and power-profile buttons below.
     readonly property var toggles: [
-        { label: "Wi-Fi", on: true, slot: 0 },
         { label: "BT", on: true, slot: 3 }
     ]
+    // True when shown inside the Wi-Fi card, so the Wi-Fi button goes back instead.
+    property bool wifiOpen: false
 
     // Power profile, cycled eco -> normal -> performance (skipped if the machine has none).
     readonly property var profiles: PowerProfiles.hasPerformanceProfile
@@ -66,6 +67,44 @@ IslandCard {
             emphasis: modelData.on ? "secondary" : "quiet"
             label: modelData.label
             labelSize: IslandTheme.small
+        }
+    }
+
+    // Wi-Fi: the signal icon and the connected network's name ("Wi-Fi" when not connected). Left click
+    // turns Wi-Fi on or off; right click opens the Wi-Fi card, or goes back from it.
+    PillButton {
+        id: wifi
+
+        x: card.pad
+        y: media.y + media.height + 8
+        width: (card.inner - 3 * 6) / 4
+        // White with black content while connected to a Wi-Fi network.
+        emphasis: Network.wifi ? "primary" : "secondary"
+        onClicked: Network.toggleWifi()
+        onRightClicked: card.open(card.wifiOpen ? "ControlCenter" : "Wifi")
+
+        Row {
+            anchors.centerIn: parent
+            width: Math.min(implicitWidth, wifi.width - 16)
+            spacing: 5
+
+            SymbolicIcon {
+                id: wifiIcon
+
+                anchors.verticalCenter: parent.verticalCenter
+                name: Network.wifiIcon
+                color: wifi.inverted || Network.wifi ? IslandTheme.pill : IslandTheme.fg
+            }
+
+            IslandText {
+                anchors.verticalCenter: parent.verticalCenter
+                width: Math.min(implicitWidth, wifi.width - 16 - wifiIcon.width - parent.spacing)
+                elide: Text.ElideRight
+                text: Network.wifi?.name ?? "Wi-Fi"
+                color: wifi.inverted || Network.wifi ? IslandTheme.pill : IslandTheme.fg
+                font.pixelSize: IslandTheme.small
+                font.weight: Font.DemiBold
+            }
         }
     }
 

@@ -1,4 +1,5 @@
 import QtQuick
+import "../../services"
 
 IslandCard {
     id: card
@@ -12,15 +13,27 @@ IslandCard {
     readonly property real sideHeight: Math.round(center.height * 0.8)
     readonly property real sideTop: Math.round((center.height - sideHeight) / 2)
 
-    readonly property var networks: [
-        { name: "HomeNet", detail: "Connected", on: true },
-        { name: "Vodafone-5G", detail: "40%", on: false },
-        { name: "MEO-WiFi", detail: "22%", on: false },
-        { name: "NOS-A3F1", detail: "18%", on: false },
-        { name: "eduroam", detail: "12%", on: false },
-        { name: "Pastelaria-Guest", detail: "9%", on: false },
-        { name: "DIRECT-HP-Printer", detail: "6%", on: false }
-    ]
+    // Which side panels show; the card keeps its width either way so the control center stays centred.
+    property bool wifiPanel: true
+    property bool bluetoothPanel: true
+
+    // Wi-Fi networks in range: the connected one says so, the rest show their signal strength; the lock
+    // marks networks that need a password.
+    readonly property var networks: Network.nearby.map(network => ({
+        name: network.name,
+        detail: network.connected ? "Connected" : Math.round(network.signalStrength * 100) + "%",
+        on: network.connected,
+        secure: Network.needsPassword(network),
+        network
+    }))
+
+    // Keep scanning while the Wi-Fi panel is open so the list stays current.
+    Binding {
+        when: card.wifiPanel && Network.wifiDevice !== null
+        target: Network.wifiDevice
+        property: "scannerEnabled"
+        value: true
+    }
     readonly property var saved: [
         { name: "AirPods", detail: "Connected", on: true },
         { name: "Keychron K2", detail: "Paired", on: false }
@@ -106,33 +119,43 @@ IslandCard {
     }
 
     Panel {
+        visible: card.wifiPanel
         x: 0
         title: "Wi-Fi"
 
-        Item {
+        ListView {
             x: 10
             y: 32
-            width: parent.width - 26
+            width: parent.width - 20
             height: parent.height - 10 - y
             clip: true
+            spacing: 6
+            boundsBehavior: Flickable.StopAtBounds
+            model: card.networks
 
-            Column {
-                width: parent.width
-                spacing: 6
+            // Left click connects, disconnects or asks for a password.
+            delegate: Entry {
+                id: wifiEntry
 
-                Repeater {
-                    model: card.networks
+                glyph: modelData.secure ? lock : null
+                highlight: modelData.on ? "strong" : entryArea.containsMouse ? "subtle" : "none"
 
-                    Entry {
-                        glyph: lock
-                    }
+                MouseArea {
+                    id: entryArea
+
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: Network.activate(wifiEntry.modelData.network)
                 }
             }
         }
 
-        Scrollbar {
-            x: parent.width - 11
-            y: 32
+        IslandText {
+            visible: card.networks.length === 0
+            anchors.centerIn: parent
+            text: "No networks"
+            tone: "muted"
+            font.pixelSize: IslandTheme.small
         }
     }
 
@@ -140,9 +163,12 @@ IslandCard {
         id: center
 
         x: card.sideWidth + card.sideGap
+        wifiOpen: card.wifiPanel
+        onOpen: name => card.open(name)
     }
 
     Panel {
+        visible: card.bluetoothPanel
         x: card.width - width
         title: "Bluetooth"
 

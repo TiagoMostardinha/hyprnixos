@@ -16,6 +16,7 @@ Rectangle {
     readonly property bool inverted: pressed || (invertOnHover && area.containsMouse)
 
     signal clicked
+    signal rightClicked
 
     height: 28
     radius: IslandTheme.radiusButton
@@ -35,6 +36,7 @@ Rectangle {
 
         anchors.fill: parent
         hoverEnabled: button.invertOnHover
-        onClicked: button.clicked()
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onClicked: mouse => mouse.button === Qt.RightButton ? button.rightClicked() : button.clicked()
     }
 }

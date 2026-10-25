@@ -23,6 +23,8 @@ PanelWindow {
 
     readonly property Item center: osd ? osdLoader.item : cardLoader.item
     readonly property bool solo: cardLoader.item?.side === "solo"
+    // Cards you type into or steer with keys: they take the keyboard, and overlays never cover them.
+    readonly property bool typing: ["Launcher", "Polkit", "WifiJoin", "Workspaces"].includes(card)
     readonly property Item left: media ? mediaLoader.item : leftOrb
 
     // The orbs sit just outside the centered card, so they spread as it grows.
@@ -35,8 +37,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
-    // Cards driven from the keyboard take it while open, so keys go straight to them.
-    WlrLayershell.keyboardFocus: ["Launcher", "Polkit", "Workspaces"].includes(card) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
+    WlrLayershell.keyboardFocus: typing ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
@@ -48,7 +49,7 @@ PanelWindow {
     // Shows an overlay card for `duration` ms (0 keeps it until dismissed). Skipped while a solo or
     // keyboard-driven card is open, so it never covers a prompt you are typing into.
     function flash(name, duration) {
-        if (!armed || solo || ["Launcher", "Polkit", "Workspaces"].includes(card))
+        if (!armed || solo || typing)
             return;
         osd = name;
         osdTimer.interval = duration;
@@ -102,6 +103,19 @@ PanelWindow {
 
         function onActiveChanged() {
             root.card = Polkit.active ? "Polkit" : "Idle";
+        }
+    }
+
+    // A new Wi-Fi network waiting for its password opens the join prompt; once it's joined or
+    // cancelled, the Wi-Fi card comes back.
+    Connections {
+        target: Network
+
+        function onJoiningChanged() {
+            if (Network.joining)
+                root.card = "WifiJoin";
+            else if (root.card === "WifiJoin")
+                root.card = "Wifi";
         }
     }
 
@@ -164,6 +178,10 @@ PanelWindow {
 
         focus: true
         Keys.onEscapePressed: {
+            if (root.card === "WifiJoin") {
+                Network.joining = null;
+                return;
+            }
             if (Polkit.active)
                 Polkit.flow.cancelAuthenticationRequest();
             root.card = "Idle";
@@ -172,7 +190,7 @@ PanelWindow {
         // With the media card open (and no keyboard-driven card in the middle), Space pauses or resumes
         // and Alt + ← / → goes to the previous / next song.
         Keys.onPressed: event => {
-            if (!root.media || ["Launcher", "Polkit", "Workspaces"].includes(root.card))
+            if (!root.media || root.typing)
                 return;
             const alt = event.modifiers & Qt.AltModifier;
             if (event.key === Qt.Key_Space && !alt)
