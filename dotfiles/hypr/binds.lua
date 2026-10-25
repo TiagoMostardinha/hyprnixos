@@ -1,7 +1,7 @@
 local mod         = "SUPER"
 local terminal    = "uwsm app -- kitty"
 local fileManager = "uwsm app -- thunar"
-local menu        = "uwsm app -- hyprlauncher"
+local menu        = "qs ipc call island launcher"
 
 hl.bind(mod .. " + Q",     hl.dsp.exec_cmd(terminal))
 hl.bind(mod .. " + C",     hl.dsp.window.close())

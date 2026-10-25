@@ -61,7 +61,7 @@ nixos-config/
     │   ├── autostart.lua        # hl.on("hyprland.start", …)
     │   ├── hypridle.conf
     │   ├── hyprpaper.conf
-    │   └── hyprtoolkit.conf     # hyprtoolkit apps (hyprlauncher, polkit agent): icon theme
+    │   └── hyprtoolkit.conf     # hyprtoolkit apps (polkit agent): icon theme
     └── quickshell/
         ├── shell.qml            # entry point: desktop shell (live, hot reload)
         ├── theme/Theme.qml      # theme tokens (pragma Singleton)

@@ -32,7 +32,6 @@ in
   home.packages = with pkgs; [
     brightnessctl
     grim
-    hyprlauncher
     playerctl
     slurp
     swappy

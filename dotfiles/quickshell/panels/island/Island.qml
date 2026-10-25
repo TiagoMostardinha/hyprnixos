@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import "../../services"
 
@@ -32,7 +33,8 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.namespace: "island"
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+    // The launcher takes the keyboard so typing goes straight into its search.
+    WlrLayershell.keyboardFocus: card === "Launcher" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.OnDemand
 
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
@@ -46,6 +48,15 @@ PanelWindow {
             return;
         osd = name;
         osdTimer.restart();
+    }
+
+    // Super + Space runs `qs ipc call island launcher`.
+    IpcHandler {
+        target: "island"
+
+        function launcher(): void {
+            root.card = root.card === "Launcher" ? "Idle" : "Launcher";
+        }
     }
 
     Timer {

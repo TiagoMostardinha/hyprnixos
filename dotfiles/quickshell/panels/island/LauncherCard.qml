@@ -1,20 +1,36 @@
 import QtQuick
+import Quickshell
+import Quickshell.Widgets
 
 IslandCard {
     id: card
 
-    readonly property var apps: [
-        { name: "About Xfce", description: "Information about the Xfce Desktop Environment" },
-        { name: "Advanced Network Configuration", description: "Manage and change your network connection settings" },
-        { name: "Alacritty", description: "Terminal" },
-        { name: "auto-cpufreq", description: "" },
-        { name: "Avahi SSH Server Browser", description: "Browse for Zeroconf-enabled SSH Servers" },
-        { name: "Avahi VNC Server Browser", description: "Browse for Zeroconf-enabled VNC Servers" }
-    ]
-    readonly property int selected: 0
+    // Visible apps sorted by name; typing keeps those whose name, generic name, keywords or comment
+    // contain the query, with names that start with it first.
+    readonly property var apps: DesktopEntries.applications.values
+        .filter(app => !app.noDisplay)
+        .sort((a, b) => a.name.localeCompare(b.name))
+    readonly property var matches: {
+        const query = search.text.trim().toLowerCase();
+        if (query === "")
+            return apps;
+        const hit = app => [app.name, app.genericName, app.comment, ...app.keywords].some(field => field?.toLowerCase().includes(query));
+        const starts = app => app.name.toLowerCase().startsWith(query);
+        const found = apps.filter(hit);
+        return found.filter(starts).concat(found.filter(app => !starts(app)));
+    }
+
+    function launch(app) {
+        if (!app)
+            return;
+        Quickshell.execDetached(["uwsm", "app", "--", app.id + ".desktop"]);
+        card.open("Idle");
+    }
 
     width: 440
     height: 258
+
+    Component.onCompleted: search.forceActiveFocus()
 
     PathGlyph {
         x: 12
@@ -23,20 +39,37 @@ IslandCard {
         stroke: "M 12 7 A 5 5 0 1 1 2 7 A 5 5 0 1 1 12 7 Z M 10.8 10.8 L 14 14"
     }
 
-    Rectangle {
-        x: 31
-        y: 20 - height / 2
-        width: 1.5
-        height: 15
-        color: IslandTheme.fg
-    }
-
     IslandText {
+        visible: search.text === ""
         x: 33
         y: 20 - height / 2
         text: "Search..."
         tone: "muted"
         font.pixelSize: IslandTheme.title
+    }
+
+    TextInput {
+        id: search
+
+        x: 33
+        y: 20 - height / 2
+        width: card.width - x - 12
+        color: IslandTheme.fg
+        selectionColor: IslandTheme.card2
+        font.family: IslandTheme.font
+        font.pixelSize: IslandTheme.title
+        clip: true
+
+        cursorDelegate: Rectangle {
+            width: 1.5
+            color: IslandTheme.fg
+        }
+
+        onTextChanged: list.currentIndex = 0
+        Keys.onUpPressed: list.decrementCurrentIndex()
+        Keys.onDownPressed: list.incrementCurrentIndex()
+        Keys.onReturnPressed: card.launch(card.matches[list.currentIndex])
+        Keys.onEnterPressed: card.launch(card.matches[list.currentIndex])
     }
 
     Rectangle {
@@ -47,35 +80,42 @@ IslandCard {
         color: IslandTheme.line
     }
 
-    Column {
+    ListView {
+        id: list
+
         x: 10
         y: 46
         width: card.width - 20
+        height: card.height - y - 6
+        clip: true
+        model: card.matches
+        highlightMoveDuration: 0
 
-        Repeater {
-            model: card.apps
+        delegate: ListRow {
+            id: row
 
-            ListRow {
-                required property var modelData
-                required property int index
+            required property var modelData
+            required property int index
 
-                width: parent.width
-                height: 34
-                radius: IslandTheme.radiusButton
-                highlight: index === card.selected ? "subtle" : "none"
-                textX: 38
-                title: modelData.name
-                titleWeight: Font.Medium
-                subtitle: modelData.description
+            width: ListView.view.width
+            height: 34
+            radius: IslandTheme.radiusButton
+            highlight: ListView.isCurrentItem ? "subtle" : "none"
+            textX: 38
+            title: modelData.name
+            titleWeight: Font.Medium
+            subtitle: modelData.comment || modelData.genericName
 
-                Rectangle {
-                    x: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: 20
-                    height: 20
-                    radius: 6
-                    color: IslandTheme.card
-                }
+            IconImage {
+                x: 10
+                anchors.verticalCenter: parent.verticalCenter
+                implicitSize: 20
+                source: Quickshell.iconPath(row.modelData.icon, "application-x-executable")
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: card.launch(row.modelData)
             }
         }
     }
