@@ -32,6 +32,7 @@ in
   home.packages = with pkgs; [
     brightnessctl
     grim
+    libnotify
     playerctl
     slurp
     swappy

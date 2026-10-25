@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import "../../services"
 
@@ -11,7 +12,7 @@ PanelWindow {
     property string card: "Idle"
     // The media card replaces the left orb next to whatever card is in the middle.
     property bool media: false
-    // Brightness or Volume, shown briefly over the middle card when the level changes.
+    // Brightness, Volume or Notification, shown briefly over the middle card.
     property string osd: ""
     property bool armed: false
 
@@ -43,11 +44,17 @@ PanelWindow {
     onSoloChanged: if (solo)
         media = false
 
-    function flash(name) {
-        if (!armed || solo)
+    // Shows an overlay card for `duration` ms (0 keeps it until dismissed). Skipped while a solo or
+    // keyboard-driven card is open, so it never covers a prompt you are typing into.
+    function flash(name, duration) {
+        if (!armed || solo || ["Launcher", "Polkit", "Workspaces"].includes(card))
             return;
         osd = name;
-        osdTimer.restart();
+        osdTimer.interval = duration;
+        if (duration > 0)
+            osdTimer.restart();
+        else
+            osdTimer.stop();
     }
 
     // Super + Space runs `qs ipc call island launcher`, Super + Tab `qs ipc call island workspaces`.
@@ -65,7 +72,6 @@ PanelWindow {
 
     Timer {
         id: osdTimer
-        interval: 1500
         // Stay up while the pointer is on the OSD.
         onTriggered: osdLoader.item?.active ? restart() : root.osd = ""
     }
@@ -90,7 +96,7 @@ PanelWindow {
         target: Brightness
 
         function onLevelChanged() {
-            root.flash("Brightness");
+            root.flash("Brightness", 1500);
         }
     }
 
@@ -98,11 +104,32 @@ PanelWindow {
         target: Audio
 
         function onVolumeChanged() {
-            root.flash("Volume");
+            root.flash("Volume", 1500);
         }
 
         function onMutedChanged() {
-            root.flash("Volume");
+            root.flash("Volume", 1500);
+        }
+    }
+
+    // A new notification shows for the time the app asked (5s by default); critical ones stay until clicked.
+    Connections {
+        target: Notifications
+
+        function onArrived(notification) {
+            const critical = notification.urgency === NotificationUrgency.Critical;
+            const timeout = notification.expireTimeout > 0 ? notification.expireTimeout : 5000;
+            root.flash("Notification", critical ? 0 : timeout);
+        }
+    }
+
+    // Hide the notification once it's gone: the app closed it, it expired, or it was clicked.
+    Connections {
+        target: Notifications.latest
+
+        function onClosed() {
+            if (root.osd === "Notification")
+                root.osd = "";
         }
     }
 
