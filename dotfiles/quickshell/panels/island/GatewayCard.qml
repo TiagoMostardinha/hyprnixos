@@ -284,45 +284,17 @@ IslandCard {
         }
     }
 
-    // Arrows sit at a fixed spot with room for the widest speed ("999 KB/s"); only the numbers,
-    // right-aligned in equal-width digits, change.
-    readonly property real speedWidth: widest.width
-
-    TextMetrics {
-        id: widest
-
-        text: "999 KB/s"
-        font.family: IslandTheme.font
-        font.pixelSize: IslandTheme.body
-        font.features: { "tnum": 1 }
-    }
-
-    IslandText {
-        x: card.width - 14 - card.speedWidth - 4 - width
-        line: 75
-        text: "↓"
-    }
-
     IslandText {
         x: card.width - 14 - width
         line: 75
-        text: card.speed(card.downRate)
-        font.features: { "tnum": 1 }
-    }
-
-    IslandText {
-        x: card.width - 14 - card.speedWidth - 4 - width
-        line: 93
-        text: "↑"
-        tone: "secondary"
+        text: "↓ " + card.speed(card.downRate)
     }
 
     IslandText {
         x: card.width - 14 - width
         line: 93
-        text: card.speed(card.upRate)
+        text: "↑ " + card.speed(card.upRate)
         tone: "secondary"
-        font.features: { "tnum": 1 }
     }
 
     Rectangle {
