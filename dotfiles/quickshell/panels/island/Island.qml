@@ -51,7 +51,8 @@ PanelWindow {
     Timer {
         id: osdTimer
         interval: 1500
-        onTriggered: root.osd = ""
+        // Stay up while the pointer is on the OSD.
+        onTriggered: osdLoader.item?.active ? restart() : root.osd = ""
     }
 
     // Levels settle as the services connect at startup; only react to changes after that.

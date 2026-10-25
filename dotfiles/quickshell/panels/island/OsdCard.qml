@@ -5,6 +5,9 @@ IslandCard {
 
     required property real level
     default property alias glyph: row.glyph
+    readonly property alias active: row.active
+
+    signal moved(real level)
 
     width: 230
     height: 30
@@ -15,5 +18,7 @@ IslandCard {
 
         anchors.fill: parent
         level: card.level
+        interactive: true
+        onMoved: level => card.moved(level)
     }
 }
