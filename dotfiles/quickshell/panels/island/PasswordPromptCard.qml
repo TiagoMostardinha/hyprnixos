@@ -2,7 +2,7 @@ import QtQuick
 
 // The password prompt used on the island: lock badge and title, a message box (message + detail),
 // a status line above the field (turns white on error), the password field and an action button.
-// Polkit and the Wi-Fi join both fill it in.
+// Polkit fills it in.
 IslandCard {
     id: card
 

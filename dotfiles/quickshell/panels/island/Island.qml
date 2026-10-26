@@ -24,8 +24,10 @@ PanelWindow {
     readonly property Item center: osd ? osdLoader.item : cardLoader.item
     readonly property bool solo: cardLoader.item?.side === "solo"
     // Cards you type into or steer with keys: they take the keyboard, and overlays never cover them.
-    readonly property bool typing: ["Launcher", "Polkit", "WifiJoin", "Workspaces"].includes(card)
+    readonly property bool typing: ["Launcher", "Polkit", "Workspaces"].includes(card)
     readonly property Item left: media ? mediaLoader.item : leftOrb
+    // The control center and its menus: new notifications wait in its notification box instead of popping up.
+    readonly property bool controlCenter: ["ControlCenter", "WifiMenu"].includes(card)
 
     // The orbs sit just outside the centered card, so they spread as it grows.
     readonly property real orbOffset: center ? center.width / 2 + center.gap : 0
@@ -42,7 +44,7 @@ PanelWindow {
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
 
-    // Big standalone cards (control center, gateway, Wi-Fi) close the media card; the orbs stay.
+    // Big standalone cards (control center, gateway) close the media card; the orbs stay.
     onSoloChanged: if (solo)
         media = false
 
@@ -106,19 +108,6 @@ PanelWindow {
         }
     }
 
-    // A new Wi-Fi network waiting for its password opens the join prompt; once it's joined or
-    // cancelled, the Wi-Fi card comes back.
-    Connections {
-        target: Network
-
-        function onJoiningChanged() {
-            if (Network.joining)
-                root.card = "WifiJoin";
-            else if (root.card === "WifiJoin")
-                root.card = "Wifi";
-        }
-    }
-
     Connections {
         target: Brightness
 
@@ -149,7 +138,8 @@ PanelWindow {
             if (Notifications.dnd && !critical)
                 return;
             const timeout = notification.expireTimeout > 0 ? notification.expireTimeout : 5000;
-            root.flash("Notification", critical ? 0 : timeout);
+            if (!root.controlCenter)
+                root.flash("Notification", critical ? 0 : timeout);
         }
     }
 
@@ -178,10 +168,6 @@ PanelWindow {
 
         focus: true
         Keys.onEscapePressed: {
-            if (root.card === "WifiJoin") {
-                Network.joining = null;
-                return;
-            }
             if (Polkit.active)
                 Polkit.flow.cancelAuthenticationRequest();
             root.card = "Idle";
@@ -276,8 +262,8 @@ PanelWindow {
 
             MouseArea {
                 anchors.fill: parent
-                // Toggles the control center (also when it's showing the Wi-Fi panel).
-                onClicked: root.card = ["ControlCenter", "Wifi"].includes(root.card) ? "Idle" : "ControlCenter"
+                // Toggles the control center (also from its Wi-Fi menu).
+                onClicked: root.card = root.controlCenter ? "Idle" : "ControlCenter"
             }
         }
     }

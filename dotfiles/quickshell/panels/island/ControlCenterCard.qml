@@ -14,9 +14,6 @@ IslandCard {
     readonly property int pad: 12
     readonly property int inner: 340
 
-    // True when shown inside the Wi-Fi card, so the Wi-Fi button goes back instead.
-    property bool wifiOpen: false
-
     // Power profile, cycled eco -> normal -> performance (skipped if the machine has none).
     readonly property var profiles: PowerProfiles.hasPerformanceProfile
         ? [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
@@ -198,14 +195,14 @@ IslandCard {
             y: 6
             width: parent.width - 12
 
-            // Wi-Fi: left click turns it on or off; right click opens the Wi-Fi card, or goes back.
+            // Wi-Fi: left click turns it on or off; right click opens the Wi-Fi menu.
             ToggleRow {
                 icon: Network.wifiIcon
                 on: Network.wifi !== null && Network.wifi !== undefined
                 title: "Wi-Fi"
                 subtitle: Network.wifi?.name ?? (Network.wifiEnabled ? "Not connected" : "Off")
                 onClicked: Network.toggleWifi()
-                onRightClicked: card.open(card.wifiOpen ? "ControlCenter" : "Wifi")
+                onRightClicked: card.open("WifiMenu")
             }
 
             ToggleRow {

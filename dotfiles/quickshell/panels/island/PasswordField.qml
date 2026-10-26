@@ -1,7 +1,7 @@
 import QtQuick
 
-// A password box: lock glyph, placeholder, dotted input; Enter emits accepted(). Shared by the polkit
-// prompt and the Wi-Fi join card.
+// A password box: lock glyph, placeholder, dotted input; Enter emits accepted(). Used by the polkit
+// prompt.
 Rectangle {
     id: field
 
