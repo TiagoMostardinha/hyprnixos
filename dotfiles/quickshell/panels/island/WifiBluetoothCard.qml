@@ -6,7 +6,6 @@ IslandCard {
 
     side: "solo"
     drop: 0
-    gap: 0
 
     readonly property int sideWidth: 210
     readonly property int sideGap: 10

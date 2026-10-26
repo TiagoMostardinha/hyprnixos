@@ -42,7 +42,7 @@ PanelWindow {
     implicitHeight: top + scene.height + shadowRoom
     color: "transparent"
 
-    // Solo cards cover the whole island, so they close the media card.
+    // Big standalone cards (control center, gateway, Wi-Fi) close the media card; the orbs stay.
     onSoloChanged: if (solo)
         media = false
 
@@ -164,9 +164,9 @@ PanelWindow {
     }
 
     mask: Region {
-        Region { item: root.solo ? null : root.left }
+        Region { item: root.left }
         Region { item: root.center }
-        Region { item: root.solo ? null : rightOrb }
+        Region { item: rightOrb }
     }
 
     Item {
@@ -174,7 +174,7 @@ PanelWindow {
 
         y: root.top
         width: root.width
-        height: Math.max(root.solo ? 1 : root.orbSize, root.center ? root.center.drop + root.center.height : 0, root.media && root.left ? root.left.drop + root.left.height : 0)
+        height: Math.max(root.orbSize, root.center ? root.center.drop + root.center.height : 0, root.media && root.left ? root.left.drop + root.left.height : 0)
 
         focus: true
         Keys.onEscapePressed: {
@@ -258,7 +258,7 @@ PanelWindow {
         CoverOrb {
             id: leftOrb
 
-            visible: !root.media && !root.solo
+            visible: !root.media
             x: scene.width / 2 - root.orbOffset - width
 
             MouseArea {
@@ -270,14 +270,14 @@ PanelWindow {
         StatusOrb {
             id: rightOrb
 
-            visible: !root.solo
             x: scene.width / 2 + root.orbOffset
             battery: Battery.available ? Battery.percent / 100 : 1
             networkIcon: Network.icon
 
             MouseArea {
                 anchors.fill: parent
-                onClicked: root.card = "ControlCenter"
+                // Toggles the control center (also when it's showing the Wi-Fi panel).
+                onClicked: root.card = ["ControlCenter", "Wifi"].includes(root.card) ? "Idle" : "ControlCenter"
             }
         }
     }

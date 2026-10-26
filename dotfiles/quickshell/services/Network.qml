@@ -8,6 +8,7 @@ Singleton {
     readonly property var wired: Networking.devices.values.find(d => d.type === DeviceType.Wired && d.connected)
     readonly property var wifiDevice: Networking.devices.values.find(d => d.type === DeviceType.Wifi) ?? null
     readonly property var wifi: Networking.devices.values.find(d => d.type === DeviceType.Wifi && d.connected)?.networks.values.find(n => n.connected)
+    readonly property bool wifiEnabled: Networking.wifiEnabled
 
     // Networks in range, one per name (hidden ones left out): the connected one first, then strongest first.
     readonly property var nearby: {

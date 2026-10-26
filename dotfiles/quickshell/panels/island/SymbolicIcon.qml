@@ -19,7 +19,7 @@ Item {
 
         anchors.fill: parent
         implicitSize: root.size
-        source: Quickshell.iconPath(root.name)
+        source: root.name ? Quickshell.iconPath(root.name) : ""
         visible: false
         layer.enabled: true
     }

@@ -1,4 +1,6 @@
 import QtQuick
+import Quickshell
+import Quickshell.Bluetooth
 import Quickshell.Services.UPower
 import Quickshell.Widgets
 import "../../services"
@@ -8,15 +10,10 @@ IslandCard {
 
     side: "solo"
     drop: 0
-    gap: 0
 
     readonly property int pad: 12
-    readonly property int inner: media.width
+    readonly property int inner: 340
 
-    // Placeholder toggle for now; slots 0–2 hold the Wi-Fi, DND and power-profile buttons below.
-    readonly property var toggles: [
-        { label: "BT", on: true, slot: 3 }
-    ]
     // True when shown inside the Wi-Fi card, so the Wi-Fi button goes back instead.
     property bool wifiOpen: false
 
@@ -30,142 +27,333 @@ IslandCard {
         [PowerProfile.Balanced]: "image-equalize-symbolic",
         [PowerProfile.Performance]: "preferences-system-power-symbolic"
     })[PowerProfiles.profile] ?? ""
+    readonly property string profileName: ({
+        [PowerProfile.PowerSaver]: "Eco",
+        [PowerProfile.Balanced]: "Balanced",
+        [PowerProfile.Performance]: "Performance"
+    })[PowerProfiles.profile] ?? ""
 
     width: inner + 2 * pad
     height: notifications.y + notifications.height + pad
 
-    component Slider: LevelRow {
+    // Screenshot: closes the control center (so it isn't in the shot), then lets you pick an area and
+    // opens it in swappy, like the Print key.
+    Item {
+        id: screenshot
+
         x: card.pad
+        y: 8
         width: card.inner
-        height: 16
-        glyphX: 2
-        barX: 22
-        barWidth: card.inner - 22 - 38
-        textMargin: 0
-        interactive: true
-    }
+        height: 20
 
-    MediaCard {
-        id: media
-
-        x: card.pad
-        y: card.pad
-        color: IslandTheme.card
-        radius: IslandTheme.radiusSection
-    }
-
-    Repeater {
-        model: card.toggles
-
-        PillButton {
-            required property var modelData
-            required property int index
-
-            x: card.pad + modelData.slot * (width + 6)
-            y: media.y + media.height + 8
-            width: (card.inner - 3 * 6) / 4
-            emphasis: modelData.on ? "secondary" : "quiet"
-            label: modelData.label
-            labelSize: IslandTheme.small
+        Rectangle {
+            anchors.centerIn: parent
+            width: shotRow.width + 12
+            height: parent.height
+            radius: height / 2
+            color: shotArea.containsMouse ? IslandTheme.card2 : "transparent"
         }
-    }
-
-    // Wi-Fi: the signal icon and the connected network's name ("Wi-Fi" when not connected). Left click
-    // turns Wi-Fi on or off; right click opens the Wi-Fi card, or goes back from it.
-    PillButton {
-        id: wifi
-
-        x: card.pad
-        y: media.y + media.height + 8
-        width: (card.inner - 3 * 6) / 4
-        // White with black content while connected to a Wi-Fi network.
-        emphasis: Network.wifi ? "primary" : "secondary"
-        onClicked: Network.toggleWifi()
-        onRightClicked: card.open(card.wifiOpen ? "ControlCenter" : "Wifi")
 
         Row {
+            id: shotRow
+
             anchors.centerIn: parent
-            width: Math.min(implicitWidth, wifi.width - 16)
             spacing: 5
 
-            SymbolicIcon {
-                id: wifiIcon
-
+            Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
-                name: Network.wifiIcon
-                color: wifi.inverted || Network.wifi ? IslandTheme.pill : IslandTheme.fg
+                width: 16
+                height: 16
+                radius: 8
+                color: IslandTheme.card2
+
+                SymbolicIcon {
+                    anchors.centerIn: parent
+                    name: "screenshot-app-symbolic"
+                    size: 10
+                }
             }
 
             IslandText {
                 anchors.verticalCenter: parent.verticalCenter
-                width: Math.min(implicitWidth, wifi.width - 16 - wifiIcon.width - parent.spacing)
-                elide: Text.ElideRight
-                text: Network.wifi?.name ?? "Wi-Fi"
-                color: wifi.inverted || Network.wifi ? IslandTheme.pill : IslandTheme.fg
+                text: "Screenshot"
                 font.pixelSize: IslandTheme.small
-                font.weight: Font.DemiBold
+                font.weight: Font.Medium
+            }
+        }
+
+        MouseArea {
+            id: shotArea
+
+            anchors.fill: parent
+            hoverEnabled: true
+            onClicked: {
+                card.open("Idle");
+                Quickshell.execDetached(["sh", "-c", 'sleep 0.2; grim -g "$(slurp)" - | swappy -f -']);
             }
         }
     }
 
-    // Do not disturb: a bell while notifications pop up, a crossed-out bell while they're held back.
-    PillButton {
-        id: dnd
+    // Toggles, laid out like a two-column control panel: a tall box of rows on the left (Wi-Fi,
+    // Bluetooth, one to define later), and on the right a wide Focus tile over two square tiles
+    // (power profile, one to define later). A filled white circle means "on".
+    readonly property real togglesTop: screenshot.y + screenshot.height + 6
+    readonly property real togglesHeight: 120
+    readonly property real column: (inner - 6) / 2
+    readonly property real tileHeight: (togglesHeight - 6) / 2
 
-        x: card.pad + 1 * (width + 6)
-        y: media.y + media.height + 8
-        width: (card.inner - 3 * 6) / 4
-        emphasis: Notifications.dnd ? "quiet" : "secondary"
-        onClicked: Notifications.dnd = !Notifications.dnd
+    component Circle: Rectangle {
+        property string icon
+        property bool on
+
+        width: 28
+        height: 28
+        radius: 14
+        color: on ? IslandTheme.fg : IslandTheme.card2
 
         SymbolicIcon {
+            visible: parent.icon !== ""
             anchors.centerIn: parent
-            name: Notifications.dnd ? "notifications-disabled-symbolic" : "notifications-symbolic"
+            name: parent.icon
             size: 14
-            color: dnd.inverted ? IslandTheme.pill : Notifications.dnd ? IslandTheme.fg2 : IslandTheme.fg
+            color: parent.on ? IslandTheme.pill : IslandTheme.fg
         }
     }
 
-    PillButton {
-        id: profile
+    component Tile: Rectangle {
+        id: tile
 
-        x: card.pad + 2 * (width + 6)
-        y: media.y + media.height + 8
-        width: (card.inner - 3 * 6) / 4
+        readonly property bool hovered: tileArea.containsMouse
+
+        signal clicked
+        signal rightClicked
+
+        radius: IslandTheme.radiusSection
+        color: hovered ? IslandTheme.card2 : IslandTheme.card
+
+        MouseArea {
+            id: tileArea
+
+            anchors.fill: parent
+            hoverEnabled: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: mouse => mouse.button === Qt.RightButton ? tile.rightClicked() : tile.clicked()
+        }
+    }
+
+    component ToggleRow: Tile {
+        property alias icon: circle.icon
+        property alias on: circle.on
+        property alias title: titleText.text
+        property alias subtitle: subtitleText.text
+
+        width: parent.width
+        height: 36
+        radius: IslandTheme.radiusButton
+        color: hovered ? IslandTheme.card2 : "transparent"
+
+        Circle {
+            id: circle
+
+            x: 4
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Column {
+            x: 40
+            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width - x - 6
+
+            IslandText {
+                id: titleText
+
+                width: parent.width
+                elide: Text.ElideRight
+                font.pixelSize: IslandTheme.body
+                font.weight: Font.DemiBold
+            }
+
+            IslandText {
+                id: subtitleText
+
+                visible: text !== ""
+                width: parent.width
+                elide: Text.ElideRight
+                tone: "secondary"
+                font.pixelSize: IslandTheme.tiny
+            }
+        }
+    }
+
+    Rectangle {
+        x: card.pad
+        y: card.togglesTop
+        width: card.column
+        height: card.togglesHeight
+        radius: IslandTheme.radiusSection
+        color: IslandTheme.card
+
+        Column {
+            x: 6
+            y: 6
+            width: parent.width - 12
+
+            // Wi-Fi: left click turns it on or off; right click opens the Wi-Fi card, or goes back.
+            ToggleRow {
+                icon: Network.wifiIcon
+                on: Network.wifi !== null && Network.wifi !== undefined
+                title: "Wi-Fi"
+                subtitle: Network.wifi?.name ?? (Network.wifiEnabled ? "Not connected" : "Off")
+                onClicked: Network.toggleWifi()
+                onRightClicked: card.open(card.wifiOpen ? "ControlCenter" : "Wifi")
+            }
+
+            ToggleRow {
+                icon: Bluetooth.defaultAdapter?.enabled ? "bluetooth-active-symbolic" : "bluetooth-disabled-symbolic"
+                on: Bluetooth.defaultAdapter?.enabled ?? false
+                title: "Bluetooth"
+                subtitle: Bluetooth.defaultAdapter?.enabled ? "On" : "Off"
+            }
+
+            // To be defined later.
+            ToggleRow {
+                title: "—"
+            }
+        }
+    }
+
+    // Focus (do not disturb): a moon; white while notifications are held back.
+    Tile {
+        x: card.pad + card.column + 6
+        y: card.togglesTop
+        width: card.column
+        height: card.tileHeight
+        onClicked: Notifications.dnd = !Notifications.dnd
+
+        Circle {
+            id: focusCircle
+
+            x: 12
+            anchors.verticalCenter: parent.verticalCenter
+            icon: "weather-clear-night-symbolic"
+            on: Notifications.dnd
+        }
+
+        IslandText {
+            x: focusCircle.x + focusCircle.width + 10
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Focus"
+            font.pixelSize: IslandTheme.title
+            font.weight: Font.DemiBold
+        }
+    }
+
+    // Power profile: cycles eco -> balanced -> performance.
+    Tile {
+        x: card.pad + card.column + 6
+        y: card.togglesTop + card.tileHeight + 6
+        width: (card.column - 6) / 2
+        height: card.tileHeight
         onClicked: {
             const next = (card.profiles.indexOf(PowerProfiles.profile) + 1) % card.profiles.length;
             PowerProfiles.profile = card.profiles[next];
         }
 
-        SymbolicIcon {
+        Column {
             anchors.centerIn: parent
-            name: card.profileIcon
-            size: 14
-            color: profile.inverted ? IslandTheme.pill : IslandTheme.fg
+            spacing: 4
+
+            SymbolicIcon {
+                anchors.horizontalCenter: parent.horizontalCenter
+                name: card.profileIcon
+                size: 16
+            }
+
+            IslandText {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: card.profileName
+                font.pixelSize: IslandTheme.tiny
+                font.weight: Font.Medium
+            }
         }
     }
 
-    Slider {
-        id: volume
+    // To be defined later.
+    Tile {
+        x: card.pad + card.column + 6 + (card.column - 6) / 2 + 6
+        y: card.togglesTop + card.tileHeight + 6
+        width: (card.column - 6) / 2
+        height: card.tileHeight
 
-        y: media.y + media.height + 46
-        level: Audio.muted ? 0 : Math.min(Audio.volume, 1)
-        onMoved: level => Audio.set(level)
-
-        SpeakerGlyph {
-            color: IslandTheme.fg2
+        IslandText {
+            anchors.centerIn: parent
+            text: "—"
+            tone: "muted"
         }
     }
 
-    Slider {
+    // Display and Sound: a titled box around each slider.
+    component LevelBox: Rectangle {
+        property alias title: boxTitle.text
+
+        x: card.pad
+        width: card.inner
+        height: 44
+        radius: IslandTheme.radiusSection
+        color: IslandTheme.card
+
+        IslandText {
+            id: boxTitle
+
+            x: 12
+            line: 16
+            tone: "secondary"
+            font.pixelSize: IslandTheme.small
+            font.weight: Font.Medium
+        }
+    }
+
+    component Slider: LevelRow {
+        x: 12
+        y: 22
+        width: parent.width - 24
+        height: 16
+        glyphX: 2
+        barX: 22
+        barWidth: width - 22 - 38
+        textMargin: 0
+        interactive: true
+    }
+
+    LevelBox {
         id: brightness
 
-        y: volume.y + 22
-        level: Brightness.level
-        onMoved: level => Brightness.set(level)
+        y: card.togglesTop + card.togglesHeight + 8
+        title: "Display"
 
-        SunGlyph {
-            color: IslandTheme.fg2
+        Slider {
+            level: Brightness.level
+            onMoved: level => Brightness.set(level)
+
+            SunGlyph {
+                color: IslandTheme.fg2
+            }
+        }
+    }
+
+    LevelBox {
+        id: volume
+
+        y: brightness.y + brightness.height + 8
+        title: "Sound"
+
+        Slider {
+            level: Audio.muted ? 0 : Math.min(Audio.volume, 1)
+            onMoved: level => Audio.set(level)
+
+            SpeakerGlyph {
+                color: IslandTheme.fg2
+            }
         }
     }
 
@@ -175,7 +363,7 @@ IslandCard {
         readonly property int rowStep: 42
 
         x: card.pad
-        y: brightness.y + brightness.height + 10
+        y: volume.y + volume.height + 8
         width: card.inner
         // Room for two notifications; more scroll.
         height: 28 + 2 * rowStep

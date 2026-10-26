@@ -9,7 +9,6 @@ IslandCard {
 
     side: "solo"
     drop: 0
-    gap: 0
 
     readonly property real battery: Battery.available ? Battery.percent / 100 : 1
 
