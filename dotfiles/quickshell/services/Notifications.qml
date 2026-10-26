@@ -29,6 +29,24 @@ Singleton {
         all.slice().forEach(notification => notification.dismiss());
     }
 
+    // When each notification arrived (by id), for the "5m"-style time in lists; the server doesn't keep it.
+    property var received: ({})
+
+    // Time since a notification arrived: "now", "5m", "2h", "3d". Follows the clock, so it updates every minute.
+    function ago(notification) {
+        const at = received[notification?.id];
+        if (!at)
+            return "";
+        const minutes = Math.floor((Time.date - at) / 60000);
+        if (minutes < 1)
+            return "now";
+        if (minutes < 60)
+            return minutes + "m";
+        if (minutes < 60 * 24)
+            return Math.floor(minutes / 60) + "h";
+        return Math.floor(minutes / (60 * 24)) + "d";
+    }
+
     signal arrived(Notification notification)
 
     NotificationServer {
@@ -44,6 +62,7 @@ Singleton {
 
         onNotification: notification => {
             notification.tracked = true;
+            root.received[notification.id] = new Date();
             root.latest = notification;
             root.arrived(notification);
         }

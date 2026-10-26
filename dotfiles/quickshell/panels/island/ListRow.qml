@@ -10,6 +10,8 @@ Rectangle {
     property color fill: "transparent"
 
     property real textX: 36
+    // Room kept clear on the right of the text (for a time or a close button).
+    property real textRight: 8
     property real spacing: 0
     property int overlineSize: IslandTheme.tiny
     property int titleSize: IslandTheme.title
@@ -36,7 +38,7 @@ Rectangle {
     Column {
         x: row.textX
         anchors.verticalCenter: parent.verticalCenter
-        width: parent.width - row.textX - 8
+        width: parent.width - row.textX - row.textRight
         spacing: row.spacing
 
         IslandText {

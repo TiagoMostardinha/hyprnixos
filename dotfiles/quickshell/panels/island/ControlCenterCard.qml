@@ -360,7 +360,7 @@ IslandCard {
     Rectangle {
         id: notifications
 
-        readonly property int rowStep: 42
+        readonly property int rowStep: 50
 
         x: card.pad
         y: volume.y + volume.height + 8
@@ -413,7 +413,7 @@ IslandCard {
             width: parent.width - 22
             height: parent.height - y - 6
             clip: true
-            spacing: notifications.rowStep - 36
+            spacing: notifications.rowStep - 44
             boundsBehavior: Flickable.StopAtBounds
             model: Notifications.history
 
@@ -425,7 +425,7 @@ IslandCard {
                 readonly property string icon: Notifications.icon(modelData)
 
                 width: ListView.view.width
-                height: 36
+                height: 44
                 radius: IslandTheme.radiusButton
                 fill: IslandTheme.card2
                 textX: 32
@@ -433,6 +433,10 @@ IslandCard {
                 overline: modelData.appName
                 title: modelData.summary
                 titleSize: IslandTheme.body
+                // The message as one dim line under the title.
+                subtitle: (modelData.body || "").replace(/\s+/g, " ")
+                subtitleSize: IslandTheme.tiny
+                textRight: 44
 
                 // Clicking a notification runs its default action and clears it.
                 MouseArea {
@@ -468,7 +472,18 @@ IslandCard {
                     source: row.icon
                 }
 
+                // How long ago it arrived, left of the close button.
                 IslandText {
+                    x: close.x - 6 - width
+                    line: 14
+                    text: Notifications.ago(row.modelData)
+                    tone: "muted"
+                    font.pixelSize: IslandTheme.tiny
+                }
+
+                IslandText {
+                    id: close
+
                     x: parent.width - 8 - width
                     line: 14
                     text: "×"
