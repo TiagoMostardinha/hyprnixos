@@ -135,6 +135,8 @@ IslandCard {
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => mouse.button === Qt.RightButton ? tile.rightClicked() : tile.clicked()
+            // A long press (on the touch screen) counts as a right click.
+            onPressAndHold: tile.rightClicked()
         }
     }
 
