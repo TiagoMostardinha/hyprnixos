@@ -205,11 +205,14 @@ IslandCard {
                 onRightClicked: card.open("WifiMenu")
             }
 
+            // Bluetooth: left click turns it on or off; right click opens the Bluetooth menu.
             ToggleRow {
                 icon: Bluetooth.defaultAdapter?.enabled ? "bluetooth-active-symbolic" : "bluetooth-disabled-symbolic"
                 on: Bluetooth.defaultAdapter?.enabled ?? false
                 title: "Bluetooth"
                 subtitle: Bluetooth.defaultAdapter?.enabled ? "On" : "Off"
+                onClicked: BluetoothDevices.toggle()
+                onRightClicked: card.open("BluetoothMenu")
             }
 
             // To be defined later.

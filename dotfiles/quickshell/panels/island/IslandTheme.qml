@@ -11,6 +11,8 @@ Singleton {
     readonly property color fg: "#ffffff"
     readonly property color fg2: "#9a9a9a"
     readonly property color fg3: "#5a5a5a"
+    // Hover box: the card grey at 60%, as on the week card.
+    readonly property color hover: Qt.rgba(0x16 / 255, 0x16 / 255, 0x16 / 255, 0.6)
     // The one colour so far: a status that is on (e.g. Tailscale connected).
     readonly property color online: "#34c759"
     readonly property string font: "Inter"

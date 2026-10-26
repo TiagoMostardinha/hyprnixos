@@ -12,8 +12,6 @@ IslandCard {
 
     readonly property int pad: 12
     readonly property int inner: 340
-    // Hover grey, the same as the week card's hover box.
-    readonly property color hoverFill: Qt.rgba(IslandTheme.card.r, IslandTheme.card.g, IslandTheme.card.b, 0.6)
 
     // Networks in range, connected first then strongest: personal hotspots (kind 2 in
     // preferred-networks.json) in their own section, the other saved or kind 1 networks under Known.
@@ -21,7 +19,7 @@ IslandCard {
         name: network.name,
         detail: network.connected ? "Connected" : network.name === Network.connecting ? "Connecting…" : network.name === Network.failed ? "Couldn't connect" : Math.round(network.signalStrength * 100) + "%",
         on: network.connected,
-        secure: Network.needsPassword(network),
+        locked: Network.needsPassword(network) && Network.kind(network) !== 2,
         kind: Network.kind(network),
         known: network.known,
         icon: Network.kind(network) === 2 ? "network-wireless-hotspot-symbolic" : Network.signalIcon(network),
@@ -39,7 +37,7 @@ IslandCard {
         name,
         detail: name === Network.connecting ? "Connecting…" : name === Network.failed ? "Couldn't connect" : "0%",
         on: false,
-        secure: Network.secured[name] ?? false,
+        locked: (Network.secured[name] ?? false) && card.remembered[name] !== 2,
         kind: card.remembered[name],
         known: true,
         icon: card.remembered[name] === 2 ? "network-wireless-hotspot-symbolic" : "network-wireless-signal-none-symbolic",
@@ -65,209 +63,76 @@ IslandCard {
     width: inner + 2 * pad
     height: settings.y + settings.height + pad - 4
 
-    // A thin line between sections, like the launcher's.
-    component Divider: Rectangle {
-        x: card.pad
-        width: card.inner
-        height: 1
-        color: IslandTheme.line
+    function activate(entry) {
+        if (entry.network) {
+            if (!Network.activate(entry.network))
+                card.openSettings();
+        } else if (!Network.wifiEnabled)
+            Network.turnOnAndConnect(entry.name);
+        else
+            Network.tryConnect(entry.name);
     }
 
-    // A small grey label with its network rows, straight on the card.
-    component Section: Item {
-        property alias title: sectionTitle.text
-        property alias model: rows.model
-
-        x: card.pad
-        width: card.inner
-        height: rowsColumn.y + rowsColumn.height
-
-        IslandText {
-            id: sectionTitle
-
-            x: 4
-            line: 12
-            tone: "secondary"
-            font.pixelSize: IslandTheme.small
-        }
-
-        Column {
-            id: rowsColumn
-
-            y: 20
-            width: parent.width
-            spacing: 4
-
-            Repeater {
-                id: rows
-
-                ListRow {
-                    id: row
-
-                    required property var modelData
-
-                    width: parent.width
-                    height: 34
-                    radius: IslandTheme.radiusButton
-                    highlight: modelData.on ? "strong" : "none"
-                    textX: 34
-                    fill: rowArea.containsMouse ? card.hoverFill : "transparent"
-                    title: modelData.name
-                    titleSize: IslandTheme.body
-                    subtitle: modelData.detail
-                    subtitleSize: IslandTheme.tiny
-
-                    SymbolicIcon {
-                        x: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: row.modelData.icon
-                        color: row.inverted ? IslandTheme.pill : IslandTheme.fg
-                    }
-
-                    // Personal hotspots leave out the lock.
-                    LockGlyph {
-                        visible: row.modelData.secure && row.modelData.kind !== 2
-                        x: parent.width - 10 - width
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: row.inverted ? IslandTheme.pill : IslandTheme.fg2
-                    }
-
-                    MouseArea {
-                        id: rowArea
-
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onClicked: {
-                            if (row.modelData.network) {
-                                if (!Network.activate(row.modelData.network))
-                                    card.openSettings();
-                            } else if (!Network.wifiEnabled)
-                                Network.turnOnAndConnect(row.modelData.name);
-                            else
-                                Network.tryConnect(row.modelData.name);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Title with a dot: green while Wi-Fi is on, grey when off. Clicking it turns Wi-Fi on or off.
-    Item {
+    // Clicking the title turns Wi-Fi on or off.
+    MenuTitle {
         x: card.pad + 4
         y: card.pad
-        width: dot.x + dot.width
-        height: 22
-
-        // Hover box.
-        Rectangle {
-            id: hoverBox
-
-            visible: titleArea.containsMouse
-            x: -6
-            y: -2
-            width: parent.width + 12
-            height: parent.height + 4
-            radius: IslandTheme.radiusButton
-            color: card.hoverFill
-        }
-
-        IslandText {
-            id: title
-
-            anchors.verticalCenter: parent.verticalCenter
-            text: "Wi-Fi"
-            font.pixelSize: IslandTheme.heading
-            font.weight: Font.DemiBold
-        }
-
-        Rectangle {
-            id: dot
-
-            x: title.width + 7
-            anchors.verticalCenter: parent.verticalCenter
-            width: 7
-            height: 7
-            radius: 3.5
-            color: Network.wifiEnabled ? IslandTheme.online : IslandTheme.fg3
-        }
-
-        MouseArea {
-            id: titleArea
-
-            anchors.fill: hoverBox
-            hoverEnabled: true
-            onClicked: Network.toggleWifi()
-        }
+        text: "Wi-Fi"
+        on: Network.wifiEnabled
+        onClicked: Network.toggleWifi()
     }
 
     // Empty sections (no hotspot in range, or Wi-Fi off) are left out along with their divider.
-    Section {
+    MenuSection {
         id: hotspot
 
         visible: card.hotspots.length > 0
+        x: card.pad
         y: card.pad + 22 + 10
+        width: card.inner
         title: "Personal Hotspot"
         model: card.hotspots
+        onActivated: entry => card.activate(entry)
     }
 
-    Divider {
+    MenuDivider {
         id: hotspotLine
 
         visible: hotspot.visible && known.visible
+        x: card.pad
         y: hotspot.y + hotspot.height + 10
+        width: card.inner
     }
 
-    Section {
+    MenuSection {
         id: known
 
         visible: card.known.length > 0
+        x: card.pad
         y: hotspot.visible ? hotspotLine.y + 10 : hotspot.y
+        width: card.inner
         title: "Known networks"
         model: card.known
+        onActivated: entry => card.activate(entry)
     }
 
-    Divider {
+    MenuDivider {
         id: knownLine
 
         visible: hotspot.visible || known.visible
+        x: card.pad
         y: (known.visible ? known.y + known.height : hotspot.y + hotspot.height) + 8
+        width: card.inner
     }
 
     // Other networks and the Wi-Fi settings both live in the network app, so one row opens it.
-    Rectangle {
+    MenuLink {
         id: settings
 
         x: card.pad
         y: knownLine.visible ? knownLine.y + 4 : card.pad + 22 + 6
         width: card.inner
-        height: 28
-        radius: IslandTheme.radiusButton
-        color: settingsArea.containsMouse ? card.hoverFill : "transparent"
-
-        MouseArea {
-            id: settingsArea
-
-            anchors.fill: parent
-            hoverEnabled: true
-            onClicked: card.openSettings()
-        }
-
-        IslandText {
-            x: 4
-            anchors.verticalCenter: parent.verticalCenter
-            text: "Network settings"
-            tone: "secondary"
-            font.pixelSize: IslandTheme.small
-            font.weight: Font.Medium
-        }
-
-        SymbolicIcon {
-            anchors.right: parent.right
-            anchors.rightMargin: 6
-            anchors.verticalCenter: parent.verticalCenter
-            name: "go-next-symbolic"
-            color: IslandTheme.fg2
-        }
+        text: "Network settings"
+        onClicked: card.openSettings()
     }
 }

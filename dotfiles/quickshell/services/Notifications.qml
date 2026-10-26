@@ -38,7 +38,9 @@ Singleton {
         bodySupported: true
         bodyMarkupSupported: false
         imageSupported: true
-        actionsSupported: true
+        // No action buttons: apps that need them (like Blueman's pairing request) fall back to their own
+        // dialog instead of a notification the island can't answer.
+        actionsSupported: false
 
         onNotification: notification => {
             notification.tracked = true;

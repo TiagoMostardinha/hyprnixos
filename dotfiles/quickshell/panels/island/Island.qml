@@ -27,7 +27,7 @@ PanelWindow {
     readonly property bool typing: ["Launcher", "Polkit", "Workspaces"].includes(card)
     readonly property Item left: media ? mediaLoader.item : leftOrb
     // The control center and its menus: new notifications wait in its notification box instead of popping up.
-    readonly property bool controlCenter: ["ControlCenter", "WifiMenu"].includes(card)
+    readonly property bool controlCenter: ["ControlCenter", "WifiMenu", "BluetoothMenu"].includes(card)
 
     // The orbs sit just outside the centered card, so they spread as it grows.
     readonly property real orbOffset: center ? center.width / 2 + center.gap : 0
@@ -262,7 +262,7 @@ PanelWindow {
 
             MouseArea {
                 anchors.fill: parent
-                // Toggles the control center (also from its Wi-Fi menu).
+                // Toggles the control center (also from its Wi-Fi or Bluetooth menu).
                 onClicked: root.card = root.controlCenter ? "Idle" : "ControlCenter"
             }
         }
