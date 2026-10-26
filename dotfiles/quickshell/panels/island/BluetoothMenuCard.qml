@@ -14,7 +14,7 @@ IslandCard {
 
     readonly property var devices: BluetoothDevices.saved.map(device => ({
         name: device.name || device.deviceName,
-        detail: device.connected ? "Connected" : device.address === BluetoothDevices.connecting ? "Connecting…" : device.address === BluetoothDevices.failed ? "Couldn't connect" : "Not connected",
+        detail: device.connected ? "Connected" + (device.batteryAvailable ? " · " + Math.round(device.battery * 100) + "%" : "") : device.address === BluetoothDevices.connecting ? "Connecting…" : device.address === BluetoothDevices.failed ? "Couldn't connect" : "Not connected",
         on: device.connected,
         icon: device.icon ? device.icon + "-symbolic" : "bluetooth-active-symbolic",
         device
