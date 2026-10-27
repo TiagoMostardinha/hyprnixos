@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Io
 
 // Claude plan usage (percent used of the 5-hour session and of the week), from scripts/claude-usage.sh,
-// checked every 10 minutes (the usage endpoint refuses frequent requests). -1 while unknown.
+// checked every 30 minutes (the usage endpoint refuses frequent requests). -1 while unknown.
 Singleton {
     id: root
 
@@ -30,7 +30,7 @@ Singleton {
     Timer {
         running: true
         repeat: true
-        interval: 10 * 60 * 1000
+        interval: 30 * 60 * 1000
         onTriggered: fetch.running = true
     }
 }
