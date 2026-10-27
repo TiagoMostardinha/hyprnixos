@@ -4,6 +4,7 @@
   home.packages = [
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
+    pkgs.claude-code
     pkgs.imv
     pkgs.spotify
     pkgs.zed-editor

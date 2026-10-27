@@ -2,8 +2,8 @@
 # Prints the Claude plan usage as two whole percentages: "<5-hour session> <week>", e.g. "32 64".
 # Reads the Claude CLI login in ~/.claude/.credentials.json. While its access token is still valid (by its
 # expiry time) it only asks for the usage. Once expired, it refreshes the token once (the only write, to
-# that file) and then asks; if anything fails it prints nothing and waits for the next check. Tokens only
-# pass through files and stdin, never command arguments.
+# that file) and then asks; if anything fails it prints nothing (and notifies, once per boot) and waits for
+# the next check. Tokens only pass through files and stdin, never command arguments.
 creds="$HOME/.claude/.credentials.json"
 [ -f "$creds" ] || exit 1
 
@@ -27,8 +27,19 @@ refresh() {
     ) && mv "$creds.new" "$creds"
 }
 
-if jq -e '.claudeAiOauth.expiresAt / 1000 > now' "$creds" > /dev/null; then
-    usage
-else
-    refresh && usage
-fi 2> /dev/null
+# A failed refresh or usage request sends one notification, at most once per boot (the marker lives in
+# the runtime dir, which is emptied at shutdown).
+notify() {
+    marker="${XDG_RUNTIME_DIR:-/tmp}/claude-usage-notified"
+    [ -e "$marker" ] && return
+    touch "$marker"
+    notify-send -a Claude -i "$(cd "$(dirname "$0")/.." && pwd)/assets/claude.svg" "$1" "$2"
+}
+
+{
+    if ! jq -e '.claudeAiOauth.expiresAt / 1000 > now' "$creds" > /dev/null && ! refresh; then
+        notify "Couldn't refresh the Claude login" "Run claude in a terminal to log in again."
+        exit 1
+    fi
+    usage || { notify "Couldn't read the Claude usage" "It will try again in 30 minutes."; exit 1; }
+} 2> /dev/null
