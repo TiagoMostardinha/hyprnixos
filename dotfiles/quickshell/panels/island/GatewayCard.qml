@@ -324,12 +324,26 @@ IslandCard {
         }
     }
 
-    IslandText {
+    // Claude plan usage: the Claude Code mark, then the 5-hour session and the week, "—" while unknown.
+    Row {
         anchors.horizontalCenter: parent.horizontalCenter
-        line: 125
-        text: Qt.formatTime(Time.date, "hh:mm") + "  " + ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][Time.date.getDay()] + ", " + Time.date.getDate() + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][Time.date.getMonth()] + " " + Time.date.getFullYear()
-        tone: "secondary"
-        font.pixelSize: IslandTheme.small
+        y: 125 - usage.baselineOffset
+        spacing: 6
+
+        // The Claude mark, lined up with the digits.
+        ClaudeGlyph {
+            // About as tall as the digits (7.5 px) and standing on their baseline.
+            y: usage.baselineOffset - height
+            color: IslandTheme.fg2
+        }
+
+        IslandText {
+            id: usage
+
+            text: "now " + (ClaudeUsage.session < 0 ? "—" : ClaudeUsage.session + "%") + "  ·  week " + (ClaudeUsage.week < 0 ? "—" : ClaudeUsage.week + "%")
+            tone: "secondary"
+            font.pixelSize: IslandTheme.small
+        }
     }
 
     IconBox {
