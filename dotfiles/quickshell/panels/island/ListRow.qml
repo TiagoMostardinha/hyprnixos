@@ -17,6 +17,10 @@ Rectangle {
     property int titleSize: IslandTheme.title
     property int titleWeight: Font.DemiBold
     property int subtitleSize: IslandTheme.small
+    // How many lines the subtitle may wrap to (1: one elided line).
+    property int subtitleLines: 1
+    // Height of the text block, for rows that grow to fit it.
+    readonly property real textHeight: textColumn.implicitHeight
 
     readonly property bool inverted: highlight === "strong"
     readonly property color ink: inverted ? IslandTheme.pill : IslandTheme.fg
@@ -36,6 +40,8 @@ Rectangle {
     }
 
     Column {
+        id: textColumn
+
         x: row.textX
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width - row.textX - row.textRight
@@ -65,6 +71,8 @@ Rectangle {
             width: parent.width
             elide: Text.ElideRight
             text: row.subtitle
+            wrapMode: row.subtitleLines > 1 ? Text.Wrap : Text.NoWrap
+            maximumLineCount: row.subtitleLines
             color: row.inkMuted
             font.pixelSize: row.subtitleSize
         }

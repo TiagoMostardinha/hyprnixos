@@ -13,6 +13,8 @@ IslandCard {
 
     readonly property int pad: 12
     readonly property int inner: 340
+    // The notifications box takes the whole control center below the screenshot button.
+    property bool expanded: false
 
     // Power profile, cycled eco -> normal -> performance (skipped if the machine has none).
     readonly property var profiles: PowerProfiles.hasPerformanceProfile
@@ -185,6 +187,7 @@ IslandCard {
     }
 
     Rectangle {
+        visible: !card.expanded
         x: card.pad
         y: card.togglesTop
         width: card.column
@@ -226,6 +229,7 @@ IslandCard {
 
     // Focus (do not disturb): a moon; white while notifications are held back.
     Tile {
+        visible: !card.expanded
         x: card.pad + card.column + 6
         y: card.togglesTop
         width: card.column
@@ -252,6 +256,7 @@ IslandCard {
 
     // Power profile: cycles eco -> balanced -> performance.
     Tile {
+        visible: !card.expanded
         x: card.pad + card.column + 6
         y: card.togglesTop + card.tileHeight + 6
         width: (card.column - 6) / 2
@@ -282,6 +287,7 @@ IslandCard {
 
     // To be defined later.
     Tile {
+        visible: !card.expanded
         x: card.pad + card.column + 6 + (card.column - 6) / 2 + 6
         y: card.togglesTop + card.tileHeight + 6
         width: (card.column - 6) / 2
@@ -330,6 +336,7 @@ IslandCard {
     LevelBox {
         id: brightness
 
+        visible: !card.expanded
         y: card.togglesTop + card.togglesHeight + 8
         title: "Display"
 
@@ -346,6 +353,7 @@ IslandCard {
     LevelBox {
         id: volume
 
+        visible: !card.expanded
         y: brightness.y + brightness.height + 8
         title: "Sound"
 
@@ -364,20 +372,44 @@ IslandCard {
 
         readonly property int rowStep: 50
 
+        // Where it sits collapsed; expanded it starts where the toggles do and ends at the same place.
+        readonly property real collapsedY: volume.y + volume.height + 8
+
         x: card.pad
-        y: volume.y + volume.height + 8
+        y: card.expanded ? card.togglesTop : collapsedY
         width: card.inner
         // Room for two notifications; more scroll.
-        height: 28 + 2 * rowStep
+        height: 28 + 2 * rowStep + (card.expanded ? collapsedY - card.togglesTop : 0)
         radius: IslandTheme.radiusSection
         color: IslandTheme.card
 
+        // Clicking the title expands or collapses the box; on hover an icon beside it shows which.
         IslandText {
             x: 10
             line: 18
             text: "Notifications"
-            tone: "secondary"
+            tone: titleArea.containsMouse ? "primary" : "secondary"
             font.pixelSize: IslandTheme.small
+
+            SymbolicIcon {
+                visible: titleArea.containsMouse
+                x: parent.width + 6
+                anchors.verticalCenter: parent.verticalCenter
+                size: 10
+                name: card.expanded ? "view-restore-symbolic" : "view-fullscreen-symbolic"
+            }
+
+            MouseArea {
+                id: titleArea
+
+                anchors.fill: parent
+                anchors.leftMargin: -4
+                anchors.topMargin: -4
+                anchors.bottomMargin: -4
+                anchors.rightMargin: -20
+                hoverEnabled: true
+                onClicked: card.expanded = !card.expanded
+            }
         }
 
         IslandText {
@@ -401,7 +433,8 @@ IslandCard {
         IslandText {
             visible: Notifications.all.length === 0
             anchors.horizontalCenter: parent.horizontalCenter
-            line: 28 + notifications.rowStep
+            // Centred in the space below the header.
+            line: (28 + parent.height) / 2 + 4
             text: "No notifications"
             tone: "muted"
             font.pixelSize: IslandTheme.small
@@ -427,7 +460,8 @@ IslandCard {
                 readonly property string icon: Notifications.icon(modelData)
 
                 width: ListView.view.width
-                height: 44
+                // Expanded, rows grow to show up to four lines of the message.
+                height: card.expanded ? Math.max(44, textHeight + 14) : 44
                 radius: IslandTheme.radiusButton
                 fill: IslandTheme.card2
                 textX: 32
@@ -435,9 +469,10 @@ IslandCard {
                 overline: modelData.appName
                 title: modelData.summary
                 titleSize: IslandTheme.body
-                // The message as one dim line under the title.
+                // The message as a dim line under the title (up to four when expanded).
                 subtitle: (modelData.body || "").replace(/\s+/g, " ")
                 subtitleSize: IslandTheme.tiny
+                subtitleLines: card.expanded ? 4 : 1
                 textRight: 44
 
                 // Clicking a notification inverts it while pressed, then opens the app that sent it, clears
@@ -484,7 +519,7 @@ IslandCard {
                 // How long ago it arrived, left of the close button.
                 IslandText {
                     x: close.x - 6 - width
-                    line: 14
+                    line: (row.height - row.textHeight) / 2 + 10
                     text: Notifications.ago(row.modelData)
                     tone: "muted"
                     font.pixelSize: IslandTheme.tiny
@@ -494,7 +529,7 @@ IslandCard {
                     id: close
 
                     x: parent.width - 8 - width
-                    line: 14
+                    line: (row.height - row.textHeight) / 2 + 10
                     text: "×"
                     tone: closeArea.containsMouse ? "primary" : "muted"
                     font.pixelSize: IslandTheme.small
