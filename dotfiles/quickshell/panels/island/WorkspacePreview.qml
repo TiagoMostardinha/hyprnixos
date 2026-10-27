@@ -13,7 +13,7 @@ Item {
     property real radius: IslandTheme.radiusSection
 
     // The same file hyprpaper shows (dotfiles/hypr/hyprpaper.conf).
-    readonly property url wallpaper: "file://" + Quickshell.env("HOME") + "/nixos-config/assets/wallpaper.jpg"
+    readonly property url wallpaper: "file://" + Quickshell.env("HOME") + "/hyprnixos/assets/wallpaper.jpg"
 
     readonly property var monitor: Hyprland.focusedMonitor?.lastIpcObject ?? {}
     readonly property real monitorX: monitor.x ?? 0

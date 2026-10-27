@@ -6,7 +6,7 @@
 }:
 
 let
-  repo = "${config.home.homeDirectory}/nixos-config";
+  repo = "${config.home.homeDirectory}/hyprnixos";
 in
 {
   home.packages = [ pkgs.quickshell ];

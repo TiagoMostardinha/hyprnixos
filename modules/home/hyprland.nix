@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  repo = "${config.home.homeDirectory}/nixos-config";
+  repo = "${config.home.homeDirectory}/hyprnixos";
   link = file: config.lib.file.mkOutOfStoreSymlink "${repo}/dotfiles/hypr/${file}";
 in
 {

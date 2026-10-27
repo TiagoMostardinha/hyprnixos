@@ -4,7 +4,7 @@ Oct 18, 2026 · @Share-me 👀
 
 ## Purpose and golden rules
 
-This is the context file for Claude Code in my `nixos-config` repo: one flake that configures a NixOS laptop running Hyprland and a custom Quickshell desktop. It lives in `docs/`, which no config file imports, so editing docs never changes the deployment. Claude Code must follow these rules unless I say otherwise in chat.
+This is the context file for Claude Code in my `hyprnixos` repo: one flake that configures a NixOS laptop running Hyprland and a custom Quickshell desktop. It lives in `docs/`, which no config file imports, so editing docs never changes the deployment. Claude Code must follow these rules unless I say otherwise in chat.
 
 1. **Simplicity over complexity.** Plain `imports` of plain files. No flake-parts, snowfall, haumea, or custom option frameworks unless I ask.
 2. **One seam: hardware vs shared.** Anything tied to one physical machine lives in `hosts/<name>/`. Everything else is shared and must work on any laptop unchanged.
@@ -20,13 +20,14 @@ This is the context file for Claude Code in my `nixos-config` repo: one flake th
 Only `hosts/<name>/` is machine-specific; every other path is shared across laptops.
 
 ```
-nixos-config/
+hyprnixos/
 ├── flake.nix                    # inputs: nixpkgs, home-manager, zen-browser → one nixosSystem per host
 ├── flake.lock                   # committed; updated only with `nix flake update`
 ├── .gitignore                   # result, result-*, .qmlls.ini
+├── README.md                    # what it has, where to change things, "new laptop" checklist
 ├── docs/                        # documentation only; nothing in the config imports it
 │   ├── Context.md               # this file
-│   └── README.md                # layout map + "new laptop" checklist
+│   └── screenshots/             # README pictures
 ├── assets/                      # wallpaper.jpg (hyprpaper), avatar.jpg (SDDM + lock, via AccountsService)
 │
 ├── hosts/                       # ONLY hardware-tied config
@@ -143,14 +144,14 @@ Home Manager is imported as a NixOS module (`home-manager.nixosModules.home-mana
 ```nix
 # modules/home/quickshell.nix
 { config, ... }:
-let repo = "${config.home.homeDirectory}/nixos-config";
+let repo = "${config.home.homeDirectory}/hyprnixos";
 in {
   xdg.configFile."quickshell".source =
     config.lib.file.mkOutOfStoreSymlink "${repo}/dotfiles/quickshell";
 }
 ```
 
-- The repo path is derived from `config.home.homeDirectory`, never hardcoded. The repo must be cloned to `~/nixos-config`.
+- The repo path is derived from `config.home.homeDirectory`, never hardcoded. The repo must be cloned to `~/hyprnixos`.
 - Link `dotfiles/hypr/*` one file at a time (`xdg.configFile."hypr/binds.lua"`, …) so the host can still generate `hypr/host.lua` next to them.
 - Use plain `source = ./file` (copied into the store) only for config that never changes or needs Nix-substituted values.
 
@@ -237,7 +238,7 @@ The desktop UI is one Quickshell config at `dotfiles/quickshell/`, linked to `~/
 **Adding a new laptop**
 
 1. Install NixOS from the ISO; enable flakes temporarily if needed.
-2. `git clone <repo> ~/nixos-config`.
+2. `git clone <repo> ~/hyprnixos`.
 3. `mkdir hosts/<new>` and `nixos-generate-config --show-hardware-config > hosts/<new>/hardware-configuration.nix`.
 4. Copy `default.nix` and `home.nix` from an existing host; change hostname, keep the new machine's `system.stateVersion` / `home.stateVersion`, set its monitors and hardware quirks.
 5. Add the host to `nixosConfigurations` in `flake.nix` (one line).
