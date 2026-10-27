@@ -46,9 +46,10 @@ IslandCard {
     readonly property var hotspots: entries.concat(away).filter(row => row.kind === 2)
     readonly property var known: entries.concat(away).filter(row => row.kind !== 2 && (row.on || row.known || row.kind === 1))
 
-    // Opens the network settings app (also where new networks with a password are joined) and closes the card.
+    // Opens nmtui in a terminal (to join new networks, with their password, and edit connections) and
+    // closes the card.
     function openSettings() {
-        Quickshell.execDetached(["nm-connection-editor"]);
+        Quickshell.execDetached(["uwsm", "app", "--", "kitty", "nmtui"]);
         card.open("Idle");
     }
 
