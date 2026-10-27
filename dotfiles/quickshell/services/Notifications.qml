@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import Quickshell.Wayland
 
 // The session's notification daemon: apps' notifications land here, and the island shows the newest.
 Singleton {
@@ -23,6 +24,17 @@ Singleton {
             return notification.image;
         const name = notification.appIcon || DesktopEntries.heuristicLookup(notification.desktopEntry || notification.appName)?.icon || "";
         return name.startsWith("/") || name.includes("://") ? name : Quickshell.iconPath(name, true);
+    }
+
+    // Brings up the app that sent a notification: its open window if there is one, otherwise launches it.
+    function openApp(notification) {
+        const entry = DesktopEntries.heuristicLookup(notification.desktopEntry || notification.appName);
+        const names = [entry?.id, entry?.startupClass, notification.desktopEntry, notification.appName].filter(name => name).map(name => name.toLowerCase());
+        const window = ToplevelManager.toplevels.values.find(toplevel => names.includes(toplevel.appId.toLowerCase()));
+        if (window)
+            window.activate();
+        else
+            entry?.execute();
     }
 
     function clear() {

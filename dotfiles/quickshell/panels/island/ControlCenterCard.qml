@@ -440,12 +440,19 @@ IslandCard {
                 subtitleSize: IslandTheme.tiny
                 textRight: 44
 
-                // Clicking a notification runs its default action and clears it.
+                // Clicking a notification inverts it while pressed, then opens the app that sent it, clears
+                // it and closes the control center.
+                highlight: rowArea.pressed ? "strong" : "none"
+
                 MouseArea {
+                    id: rowArea
+
                     anchors.fill: parent
                     onClicked: {
-                        row.modelData.actions.find(action => action.identifier === "default")?.invoke();
-                        row.modelData.dismiss();
+                        const notification = row.modelData;
+                        Notifications.openApp(notification);
+                        card.open("Idle");
+                        notification.dismiss();
                     }
                 }
 
