@@ -18,10 +18,22 @@
       url = "github:poeck/claude-desktop-nix-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+      inputs.darwin.follows = "";
+    };
   };
 
   outputs =
-    inputs@{ nixpkgs, home-manager, ... }:
+    inputs@{
+      nixpkgs,
+      home-manager,
+      agenix,
+      ...
+    }:
     let
       username = "tiago";
 
@@ -32,6 +44,7 @@
           modules = [
             ./hosts/${hostname}
             home-manager.nixosModules.home-manager
+            agenix.nixosModules.default
           ];
         };
     in

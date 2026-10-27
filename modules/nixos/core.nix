@@ -1,4 +1,4 @@
-{ lib, pkgs, username, ... }:
+{ inputs, lib, pkgs, username, ... }:
 
 {
   nix.settings = {
@@ -49,6 +49,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
     btop
     curl
     git

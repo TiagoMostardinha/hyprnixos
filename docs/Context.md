@@ -73,7 +73,7 @@ nixos-config/
 
 The host's `home.nix` generates `~/.config/hypr/host.lua`; the shared `hyprland.lua` loads it with `dofile`, last, so it overrides the fallback monitor. That is why `dotfiles/hypr/` is linked file by file, not as one folder.
 
-Add `secrets/` (sops-nix or agenix) only when the first real secret appears, and `lib/` or `profiles/` only when a second host makes duplication painful.
+agenix is installed (the module and the `agenix` CLI); add `secrets/` only when the first real secret appears, and `lib/` or `profiles/` only when a second host makes duplication painful.
 
 ## NixOS and flakes policies
 
@@ -124,7 +124,7 @@ Every `.nix` file is a NixOS module; keep each one small, single-topic, and impo
 **Secrets**
 
 - The Nix store is world-readable. Never put passwords, Wi-Fi PSKs, tokens or keys in any `.nix` file or string that ends up in the store.
-- When secrets are needed, use sops-nix or agenix (decrypted at activation into `/run`), and reference them by path. Use `hashedPasswordFile` / `hashedPassword` for users, never `password`.
+- When secrets are needed, use agenix (decrypted at activation into `/run`), and reference them by path. Use `hashedPasswordFile` / `hashedPassword` for users, never `password`.
 
 ## Home Manager policies
 
