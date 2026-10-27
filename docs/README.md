@@ -23,6 +23,7 @@ My NixOS laptop setup in one flake:
 | Apps | `modules/home/apps.nix` |
 | System packages and services | `modules/nixos/` |
 | Hotspots and known networks | `~/.local/state/quickshell/preferred-networks.json` (kind `1` known, `2` hotspot) |
+| Claude usage (gateway card) | `dotfiles/quickshell/scripts/claude-statusline.sh`, set as `statusLine` in `~/.claude/settings.json` |
 | Login screen theme | `modules/nixos/sddm/theme/` |
 
 Files in `dotfiles/` are symlinked, so changes apply on save. Everything else needs a rebuild.

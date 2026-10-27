@@ -4,36 +4,42 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Claude plan usage (percent used of the 5-hour session and of the week), from scripts/claude-usage.sh,
-// checked 5 minutes after startup, then every 30 (the usage endpoint refuses frequent requests). -1 while unknown.
+// Claude plan usage (percent used of the 5-hour session and of the week), saved by Claude Code's status line
+// (scripts/claude-statusline.sh) to ~/.local/state/quickshell/claude-usage.json while you use claude in a
+// terminal. -1 while unknown, or once that window has reset since.
 Singleton {
     id: root
 
-    property int session: -1
-    property int week: -1
+    readonly property int session: percent(usage.five_hour)
+    readonly property int week: percent(usage.seven_day)
 
-    Process {
-        id: fetch
-
-        command: ["sh", Quickshell.shellDir + "/scripts/claude-usage.sh"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const [session, week] = text.trim().split(" ").map(Number);
-                const ok = text.trim() !== "" && !isNaN(session) && !isNaN(week);
-                root.session = ok ? session : -1;
-                root.week = ok ? week : -1;
-            }
+    readonly property var usage: {
+        try {
+            return JSON.parse(file.text() || "{}") ?? {};
+        } catch (error) {
+            return {};
         }
     }
+    property real now: Date.now() / 1000
 
-    // First check 5 minutes after startup (so the network is up after boot), then every 30 minutes.
+    function percent(window) {
+        return window?.resets_at > now ? Math.round(window.used_percentage) : -1;
+    }
+
+    FileView {
+        id: file
+
+        path: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/quickshell/claude-usage.json"
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+    }
+
+    // Rechecks the reset times each minute, so a window that has reset shows as unknown.
     Timer {
         running: true
         repeat: true
-        interval: 5 * 60 * 1000
-        onTriggered: {
-            fetch.running = true;
-            interval = 30 * 60 * 1000;
-        }
+        interval: 60 * 1000
+        onTriggered: root.now = Date.now() / 1000
     }
 }
