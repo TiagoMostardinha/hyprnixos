@@ -24,9 +24,9 @@ hyprnixos/
 ├── flake.nix                    # inputs: nixpkgs, home-manager, zen-browser → one nixosSystem per host
 ├── flake.lock                   # committed; updated only with `nix flake update`
 ├── .gitignore                   # result, result-*, .qmlls.ini
-├── README.md                    # what it has, where to change things, "new laptop" checklist
 ├── docs/                        # documentation only; nothing in the config imports it
 │   ├── Context.md               # this file
+│   ├── README.md                # what it has, where to change things, "new laptop" checklist (GitHub shows it)
 │   └── screenshots/             # README pictures
 ├── assets/                      # wallpaper.jpg (hyprpaper), avatar.jpg (SDDM + lock, via AccountsService)
 │

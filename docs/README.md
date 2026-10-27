@@ -38,7 +38,7 @@ Files in `dotfiles/` are symlinked, so changes apply on save. Everything else ne
 | `dotfiles/hypr/` | Hyprland Lua + hypridle/hyprpaper |
 | `dotfiles/quickshell/` | Quickshell config, linked to `~/.config/quickshell` |
 | `assets/` | wallpaper, avatar |
-| `docs/` | rules for working in this repo (`Context.md`), README screenshots |
+| `docs/` | this README, its screenshots, and rules for working in this repo (`Context.md`) |
 
 Clone the repo to `~/hyprnixos` (the dotfile links point there).
 
@@ -67,27 +67,27 @@ sudo nixos-rebuild switch --flake .#latitude-7340
 
 <table>
 <tr>
-<td width="25%" align="center" valign="middle"><img src="docs/screenshots/idle.png" width="100%"></td>
-<td width="25%" align="center" valign="middle"><img src="docs/screenshots/control-center.png" width="100%"></td>
-<td width="25%" align="center" valign="middle"><img src="docs/screenshots/wifi.png" width="100%"></td>
-<td width="25%" align="center" valign="middle"><img src="docs/screenshots/bluetooth.png" width="100%"></td>
+<td width="25%" align="center" valign="middle"><img src="screenshots/idle.png" width="100%"></td>
+<td width="25%" align="center" valign="middle"><img src="screenshots/control-center.png" width="100%"></td>
+<td width="25%" align="center" valign="middle"><img src="screenshots/wifi.png" width="100%"></td>
+<td width="25%" align="center" valign="middle"><img src="screenshots/bluetooth.png" width="100%"></td>
 </tr>
 <tr>
-<td align="center" valign="middle"><img src="docs/screenshots/gateway.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/launcher.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/workspaces.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/media.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/gateway.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/launcher.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/workspaces.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/media.png" width="100%"></td>
 </tr>
 <tr>
-<td align="center" valign="middle"><img src="docs/screenshots/week.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/calendar.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/notification.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/polkit.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/week.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/calendar.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/notification.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/polkit.png" width="100%"></td>
 </tr>
 <tr>
-<td align="center" valign="middle"><img src="docs/screenshots/volume.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/brightness.png" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/sddm.jpg" width="100%"></td>
-<td align="center" valign="middle"><img src="docs/screenshots/lock.jpg" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/volume.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/brightness.png" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/sddm.jpg" width="100%"></td>
+<td align="center" valign="middle"><img src="screenshots/lock.jpg" width="100%"></td>
 </tr>
 </table>
