@@ -32,4 +32,10 @@
       copy_on_select = "clipboard";
     };
   };
+
+  # Terminal apps (Terminal=true, like btop) open in kitty. Without this, uwsm can pick kitty-open.desktop,
+  # kitty's URL opener, which is also marked as a terminal.
+  xdg.configFile."xdg-terminals.list".text = ''
+    kitty.desktop
+  '';
 }
