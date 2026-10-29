@@ -47,6 +47,13 @@
 
   hardware.sensor.iio.enable = true;
 
+  # Broadcom 58200 fingerprint reader (0a5c:5843): only Broadcom's TOD driver supports it.
+  services.fprintd = {
+    enable = true;
+    tod.enable = true;
+    tod.driver = pkgs.libfprint-2-tod1-broadcom;
+  };
+
   services.hardware.bolt.enable = true;
   services.thermald.enable = true;
 
