@@ -63,7 +63,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: root.height * Theme.promptY - height / 2
         visible: root.password.length === 0
-        text: root.busy ? "Checking…" : root.failed ? "Wrong password" : "Enter Password"
+        text: root.busy ? "Checking…" : root.failed ? "Wrong password" : "Touch sensor or enter password"
         color: root.failed ? Theme.error : Theme.textMuted
         font.family: Theme.fontFamily
         font.pixelSize: root.height * Theme.promptSize
