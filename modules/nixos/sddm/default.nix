@@ -25,6 +25,7 @@ in
   };
 
   security.pam.services.sddm.enableGnomeKeyring = true;
+  security.pam.services.login.fprintAuth = false;
 
   environment.systemPackages = [ theme ];
 
