@@ -54,6 +54,9 @@
     tod.driver = pkgs.libfprint-2-tod1-broadcom;
   };
 
+  # Polkit asks for the password after 10 seconds without a finger (pam_fprintd's default is 30, and 10 its minimum).
+  security.pam.services.polkit-1.rules.auth.fprintd.args = [ "timeout=10" ];
+
   services.hardware.bolt.enable = true;
   services.thermald.enable = true;
 
