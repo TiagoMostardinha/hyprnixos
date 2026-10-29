@@ -35,6 +35,8 @@
   services.gnome.gnome-keyring.enable = true;
   services.gnome.gcr-ssh-agent.enable = false;
 
-  security.pam.services.quickshell = { };
+  # The lock screen checks the password (quickshell) and the fingerprint (quickshell-fingerprint) side by side.
+  security.pam.services.quickshell.fprintAuth = false;
+  security.pam.services.quickshell-fingerprint.unixAuth = false;
   security.pam.services.polkit-1.nodelay = true;
 }

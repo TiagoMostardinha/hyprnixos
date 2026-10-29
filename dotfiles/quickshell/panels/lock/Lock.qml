@@ -9,7 +9,10 @@ Scope {
     LockContext {
         id: lockContext
 
-        onUnlocked: sessionLock.locked = false
+        onUnlocked: {
+            sessionLock.locked = false;
+            locked = false;
+        }
     }
 
     WlSessionLock {
@@ -25,6 +28,7 @@ Scope {
 
         function lock(): void {
             sessionLock.locked = true;
+            lockContext.locked = true;
         }
     }
 }
