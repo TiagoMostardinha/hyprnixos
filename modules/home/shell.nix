@@ -6,6 +6,20 @@
     shellAliases.sudo = "run0 --background=";
   };
 
+  programs.git = {
+    enable = true;
+    settings = {
+      user.name = "Tiago Mostardinha";
+      user.email = "tiago.mostardinha@ua.pt";
+      init.defaultBranch = "main";
+    };
+    signing = {
+      format = "ssh";
+      key = "~/.ssh/github_ed25519.pub";
+      signByDefault = true;
+    };
+  };
+
   programs.fzf.enable = true;
 
   programs.direnv = {
