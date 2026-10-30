@@ -13,13 +13,20 @@ IslandCard {
     property bool error: false
     property bool visibleText: false
     property string buttonLabel
+    property bool locked: false
 
     signal submitted(string password)
 
     function submit() {
+        if (locked)
+            return;
         submitted(field.text);
-        field.text = "";
+        if (!locked)
+            field.text = "";
     }
+
+    onLockedChanged: if (!locked)
+        field.text = ""
 
     width: 400
     height: field.y + field.height + 12
@@ -104,6 +111,7 @@ IslandCard {
         width: action.x - x - 6
         error: card.error
         visibleText: card.visibleText
+        readOnly: card.locked
         onAccepted: card.submit()
     }
 

@@ -6,6 +6,7 @@ Rectangle {
     id: field
 
     property alias text: input.text
+    property alias readOnly: input.readOnly
     property bool visibleText: false
     property bool error: false
     property string placeholder: "Enter your password"
