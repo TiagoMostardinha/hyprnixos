@@ -51,7 +51,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         y: sh * 0.935 - height / 2
         visible: pw.text.length === 0
-        text: root.failed ? "Wrong password" : "Touch ID or Enter Password"
+        text: root.failed ? "Wrong password" : "Enter Password"
         color: root.failed ? "#ff8a8a" : Qt.rgba(1, 1, 1, 0.6)
         font.family: fontFamily
         font.pixelSize: sh * 0.011
